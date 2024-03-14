@@ -1,23 +1,32 @@
 ﻿#pragma once
+#include <iostream>
+
+#include "Button.h"
 #include "GameState.h"
-#include "Snake.h"
+#include "PlayerSnake.h"
+#include "../lib/RayLib/raylib.h"
 
 class Game
 {
 public:
-    Snake snake;
+    // std::vector<Snake>snakes;
+    Config config;
+    SnakeBase snake;
     Vector2 food;
     Vector2 direction;
-    bool gameOver;
     GameState gameState;
+    Button startButton;
+    Button pauseButton;
+    Button restartButton;
+    Button menuButton;
+    int score;
 
-    Game(const Vector2& food, const Config& config);
+    Game(const Config& config, SnakeBase snake);
 
     Game();
-    void Update();
-    void Draw();
-    void SpawnFood();
+    void update();
+    void draw();
 
 private:
-    Config config;
+    void spawn_food();
 };
