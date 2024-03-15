@@ -12,7 +12,6 @@ public:
     Config config;
     std::unique_ptr<SnakeBase> snake;
     Vector2 food;
-    Vector2 direction;
     GameState gameState;
     Button startButton;
     Button pauseButton;

@@ -7,5 +7,5 @@ class PlayerSnake final : public SnakeBase
 {
 public:
     PlayerSnake(const Color& snakeColor, const Config& config);
-    void move(Vector2& direction) override;
+    void move() override;
 };

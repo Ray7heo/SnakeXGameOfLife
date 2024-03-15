@@ -4,7 +4,7 @@
 PlayerSnake::PlayerSnake(const Color& snakeColor, const Config& config): SnakeBase(snakeColor, config)
 {}
 
-void PlayerSnake::move(Vector2& direction)
+void PlayerSnake::move()
 {
     const auto isOnlyHead = body.size() < 2;
     if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP))
@@ -27,5 +27,7 @@ void PlayerSnake::move(Vector2& direction)
         if (direction.x != -1 || isOnlyHead)
             direction = {1, 0};
     }
-    SnakeBase::move(direction);
+    SnakeBase::move();
 }
+
+

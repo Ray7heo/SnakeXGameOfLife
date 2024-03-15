@@ -1,7 +1,10 @@
 ﻿#include "../include/Game.h"
 
+#include "../include/AutoSnake.h"
+
 // no arg
-Game::Game() : snake(std::make_unique<PlayerSnake>(GREEN, config)), food({400, 200}), direction({1, 0}), gameState(GameState::Start),
+Game::Game() : snake(std::make_unique<PlayerSnake>(GREEN, config)), food({400, 200}),
+               gameState(GameState::Start),
                startButton({400 - 100, 225 - 25, 200, 50}, GREEN, BLACK, "Start"),
                pauseButton({static_cast<float>(config.screenWidth) - 120, 10, 100, 30},GREEN, BLACK, "Pause"),
                restartButton({
@@ -24,7 +27,7 @@ Game::Game(const Config& config, SnakeBase& snake): config(config),
                                                         static_cast<float>(config.screenWidth) / 2,
                                                         static_cast<float>(config.screenHeight) / 2
                                                     }),
-                                                    direction({1, 0}), gameState(GameState::Start),
+                                                    gameState(GameState::Start),
                                                     startButton({400 - 100, 225 - 25, 200, 50}, GREEN, BLACK, "Start"),
                                                     pauseButton({
                                                                     static_cast<float>(config.screenWidth) - 120, 10,
@@ -52,13 +55,14 @@ Game::Game(const Config& config, SnakeBase& snake): config(config),
 
 void Game::update()
 {
-    const auto onlyHead = snake->body.size() < 2;
     switch (gameState)
     {
     case GameState::Start:
         break;
     case GameState::Playing:
-        snake->move(direction);
+        snake->move();
+    // auto v = Vector2{food.x, food.y};
+    // snake->autoMove(v);
 
     // Check collision with food
         if (CheckCollisionRecs(snake->getCollisionRec(), {
@@ -88,6 +92,8 @@ void Game::draw()
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
+
+
     switch (gameState)
     {
     case GameState::Start:

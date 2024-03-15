@@ -1,22 +1,17 @@
 ﻿#include "../include/SnakeBase.h"
 
-
 SnakeBase::SnakeBase(const Color& color, const Config& config):
-    color(color),
+    color(color), isDead(false), direction(Vector2{1, 0}),
     config(config)
 {
-    auto v = Vector2();
-    v.x = config.screenWidth / 2;
-    v.y = config.screenHeight / 2;
-    position = v;
+    position = Vector2{static_cast<float>(config.screenWidth) / 2, static_cast<float>(config.screenHeight) / 2};
     body.push_back(position);
 }
 
-
-void SnakeBase::move(Vector2& direction)
+void SnakeBase::move()
 {
-    position.x += direction.x * config.squareSize;
-    position.y += direction.y * config.squareSize;
+    position.x += this->direction.x * config.squareSize;
+    position.y += this->direction.y * config.squareSize;
 
     // Move body
     for (int i = body.size() - 1; i > 0; i--)
@@ -46,6 +41,10 @@ void SnakeBase::move(Vector2& direction)
     }
 }
 
+void SnakeBase::autoMove(Vector2& foodPosition)
+{
+}
+
 void SnakeBase::draw() const
 {
     // draw head
@@ -66,7 +65,7 @@ void SnakeBase::draw() const
 
 void SnakeBase::grow()
 {
-    body.push_back(body[body.size() - 1]);
+    body.push_back(body.back());
 }
 
 Rectangle SnakeBase::getCollisionRec() const

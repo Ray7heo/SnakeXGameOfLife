@@ -12,12 +12,15 @@ public:
     std::vector<Vector2> body;
     Color color;
     bool isDead;
+    Vector2 direction;
     
     SnakeBase(const Color& color, const Config& config);
-    virtual void move(Vector2& direction);
+    virtual void move();
+    virtual void autoMove(Vector2& foodPosition);
     void draw() const;
     void grow();
     Rectangle getCollisionRec() const;
+    
 
 protected:
     Config config;
