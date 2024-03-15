@@ -9,9 +9,8 @@
 class Game
 {
 public:
-    // std::vector<Snake>snakes;
     Config config;
-    SnakeBase snake;
+    std::unique_ptr<SnakeBase> snake;
     Vector2 food;
     Vector2 direction;
     GameState gameState;
@@ -21,7 +20,7 @@ public:
     Button menuButton;
     int score;
 
-    Game(const Config& config, SnakeBase snake);
+    Game(const Config& config, SnakeBase& snake);
 
     Game();
     void update();

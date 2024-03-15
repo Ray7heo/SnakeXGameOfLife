@@ -9,13 +9,16 @@ class SnakeBase
 public:
     virtual ~SnakeBase() = default;
     Vector2 position;
-    Color color;
     std::vector<Vector2> body;
+    Color color;
+    bool isDead;
+    
     SnakeBase(const Color& color, const Config& config);
-    virtual void move(Vector2 dir);
+    virtual void move(Vector2& direction);
     void draw() const;
     void grow();
     Rectangle getCollisionRec() const;
-private:
-    Config config; 
+
+protected:
+    Config config;
 };

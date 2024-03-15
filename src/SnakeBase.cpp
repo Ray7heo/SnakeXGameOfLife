@@ -13,10 +13,10 @@ SnakeBase::SnakeBase(const Color& color, const Config& config):
 }
 
 
-void SnakeBase::move(Vector2 dir)
+void SnakeBase::move(Vector2& direction)
 {
-    position.x += dir.x * config.squareSize;
-    position.y += dir.y * config.squareSize;
+    position.x += direction.x * config.squareSize;
+    position.y += direction.y * config.squareSize;
 
     // Move body
     for (int i = body.size() - 1; i > 0; i--)
@@ -24,6 +24,26 @@ void SnakeBase::move(Vector2 dir)
         body[i] = body[i - 1];
     }
     body[0] = position;
+
+
+    // Check collision with walls
+    if (position.x >= config.screenWidth || position.x < 0 || position.y >= config.screenHeight || position.y < 0)
+    {
+        isDead = true;
+    }
+
+    // Check self-collision
+    if (body.size() >= 2)
+    {
+        for (size_t i = 1; i < body.size(); i++)
+        {
+            if (position.x == body[i].x && position.y == body[i].y)
+            {
+                isDead = true;
+                break;
+            }
+        }
+    }
 }
 
 void SnakeBase::draw() const
@@ -51,5 +71,5 @@ void SnakeBase::grow()
 
 Rectangle SnakeBase::getCollisionRec() const
 {
-    return {position.x, position.y, (float)config.squareSize, (float)config.squareSize};
+    return {position.x, position.y, static_cast<float>(config.squareSize), static_cast<float>(config.squareSize)};
 }
