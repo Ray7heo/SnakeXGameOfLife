@@ -2,9 +2,8 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
-
 #include "Config.h"
-#include "../lib/RayLib/raylib.h"
+#include <raylib.h>
 
 class SnakeBase
 {

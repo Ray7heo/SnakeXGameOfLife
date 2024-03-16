@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Config.h"
 #include "SnakeBase.h"
-#include "../lib/RayLib/raylib.h"
+#include <raylib.h>
 
 class PlayerSnake final : public SnakeBase
 {

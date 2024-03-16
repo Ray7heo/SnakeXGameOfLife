@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include <iostream>
+#include <raylib.h>
 
 #include "Button.h"
 #include "GameState.h"
 #include "PlayerSnake.h"
-#include "../lib/RayLib/raylib.h"
 
 class GameBase
 {

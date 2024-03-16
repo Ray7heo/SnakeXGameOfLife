@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <string>
-#include "../lib/RayLib/raylib.h"
+#include <raylib.h>
 
 class Button
 {

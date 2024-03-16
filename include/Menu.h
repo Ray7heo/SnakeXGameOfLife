@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <thread>
 #include "Config.h"
-#include "../lib/RayLib/raylib.h"
+#include <raylib.h>
 #include "../include/Config.h"
 #include "../include/SingleGame.h"
 #include "../include/PVPLocalGame.h"
