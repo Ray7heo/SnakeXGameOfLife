@@ -3,6 +3,7 @@
 #include "include/Config.h"
 #include "include/SingleGame.h"
 #include "include/GameBase.h"
+#include "include/PVPLocalGame.h"
 
 
 int main(int argc, char* argv[])
@@ -10,7 +11,7 @@ int main(int argc, char* argv[])
     const auto config = Config();
     InitWindow(config.gridWidth * config.tileSize, config.gridHeight * config.tileSize, "Snake Game");
 
-    const std::unique_ptr<GameBase> game = std::make_unique<PVEGame>(); 
+    const std::unique_ptr<GameBase> game = std::make_unique<PVPLocalGame>(); 
      
     SetTargetFPS(10);
 

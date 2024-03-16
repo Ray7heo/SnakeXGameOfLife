@@ -2,8 +2,9 @@
 
 
 PlayerSnake::PlayerSnake(const Color& headColor, const Color& tailColor, const Config& config,
-                         const Vector2& startPosition): SnakeBase(headColor, tailColor, config, startPosition),
-                                                        useArrowInput(false)
+                         const Vector2& startPosition,
+                         const bool useArrowInput): SnakeBase(headColor, tailColor, config, startPosition),
+                                                    useArrowInput(useArrowInput)
 {
 }
 
@@ -35,22 +36,22 @@ void PlayerSnake::move()
     }
     else
     {
-        if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP))
+        if (IsKeyPressed(KEY_W))
         {
             if (direction.y != 1 || isOnlyHead)
                 direction = {0, -1};
         }
-        else if (IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN))
+        else if (IsKeyPressed(KEY_S))
         {
             if (direction.y != -1 || isOnlyHead)
                 direction = {0, 1};
         }
-        else if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT))
+        else if (IsKeyPressed(KEY_A))
         {
             if (direction.x != 1 || isOnlyHead)
                 direction = {-1, 0};
         }
-        else if (IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT))
+        else if (IsKeyPressed(KEY_D))
         {
             if (direction.x != -1 || isOnlyHead)
                 direction = {1, 0};

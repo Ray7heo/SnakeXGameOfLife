@@ -2,7 +2,7 @@
 
 
 SnakeBase::SnakeBase(const Color& headColor, const Color& tailColor,const Config& config, const Vector2 startPosition):
-    headColor(headColor), tailColor(tailColor), isDead(false), direction(Vector2{1, 0}),
+    headColor(headColor), tailColor(tailColor), isDead(false), direction(Vector2{0, 0}),
     config(config)
 {
     body.push_back(startPosition);
@@ -16,7 +16,7 @@ void SnakeBase::move()
     body.pop_back();
 
     // Check collision with walls
-    if (body.front().x >= static_cast<float>(config.gridWidth) || body.front().x < 0 || body.front().y >= static_cast<float>(config.gridHeight) || body.front().
+    if (body.front().x > static_cast<float>(config.gridWidth) || body.front().x < 0 || body.front().y > static_cast<float>(config.gridHeight) || body.front().
         y < 0)
     {
         isDead = true;

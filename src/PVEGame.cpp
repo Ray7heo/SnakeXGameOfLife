@@ -39,7 +39,6 @@ void PVEGame::update()
         {
             gameState = GameState::GameOver;
         }
-        
     }
     GameBase::update();
 }
@@ -62,9 +61,9 @@ void PVEGame::restart()
     GameBase::restart();
     autoScore = 0;
     autoSnake = std::make_unique<AutoSnake>(BLUE,BLACK, config, Vector2{
-                                            static_cast<float>(config.gridWidth),
-                                            static_cast<float>(config.gridHeight / 2)
-                                        });
+                                                static_cast<float>(config.gridWidth),
+                                                static_cast<float>(config.gridHeight / 2)
+                                            });
     autoSnake->autoMove(food);
     snake = std::make_unique<
         PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
