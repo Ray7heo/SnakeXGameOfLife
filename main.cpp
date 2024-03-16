@@ -1,30 +1,16 @@
 
-#include "include/PVEGame.h"
-#include "include/Config.h"
-#include "include/SingleGame.h"
-#include "include/GameBase.h"
-#include "include/PVPLocalGame.h"
 
+
+#include "include/Config.h"
+#include "include/Menu.h"
 
 int main(int argc, char* argv[])
 {
     const auto config = Config();
-    InitWindow(config.gridWidth * config.tileSize, config.gridHeight * config.tileSize, "Snake Game");
 
-    const std::unique_ptr<GameBase> game = std::make_unique<PVPLocalGame>(); 
-     
-    SetTargetFPS(10);
+    auto menu = Menu(config);
 
-    while (!WindowShouldClose())
-    {
-        if (game->gameState == GameState::Playing)
-        {
-            game->update();
-        }
-        game->draw();
-    }
-
-    CloseWindow();
-
+    menu.update();
+    
     return 0;
 }

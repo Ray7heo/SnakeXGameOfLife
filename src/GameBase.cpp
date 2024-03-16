@@ -8,22 +8,22 @@ GameBase::GameBase() : config(Config()), gameState(GameState::Start),
                                        static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) -
                                        100,
                                        static_cast<float>(15 * config.tileSize) - 25, 200, 50
-                                   }, GREEN, BLACK, "Start"),
-                       pauseButton({static_cast<float>(config.gridWidth * config.tileSize) - 120, 10, 100, 30},GREEN,
-                                   BLACK,
-                                   "Pause"),
+                                   }, "Start"),
+                       pauseButton({
+                                       static_cast<float>(config.gridWidth * config.tileSize) - 120, 10, 100, 30
+                                   }, "Pause"),
                        restartButton({
                                          static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize)
                                          - 100,
                                          static_cast<float>(15 * config.tileSize) - 25, 200, 50
-                                     }, GREEN, BLACK, "ReStart"),
+                                     }, "ReStart"),
                        menuButton({
                                       static_cast<float>(config.gridWidth * config.tileSize) / 2 - 100,
-                                      static_cast<float>(config.gridHeight * config.tileSize) / 2 - 25 + restartButton.
+                                      static_cast<float>(config.gridHeight * config.tileSize) / 2 + restartButton.
                                       bounds.
                                       height,
                                       200, 50
-                                  }, GREEN, BLACK, "Menu")
+                                  }, "Menu")
 
 {
     spawnFood();
@@ -36,16 +36,16 @@ GameBase::GameBase(const Config& config, SnakeBase& snake):
     startButton({
                     static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) - 100,
                     static_cast<float>(15 * config.tileSize) - 25, 200, 50
-                }, GREEN, BLACK, "Start"),
+                }, "Start"),
     pauseButton({static_cast<float>(config.gridWidth * config.tileSize) - 120, 10, 100, 30},GREEN, BLACK, "Pause"),
     restartButton({
                       static_cast<float>(config.gridWidth) / 2 - 100, static_cast<float>(config.gridHeight) / 2 - 25,
                       200, 50
-                  },GREEN,BLACK, "Restart"),
+                  }, "Restart"),
     menuButton({
                    static_cast<float>(config.gridWidth) / 2 - 100,
                    static_cast<float>(config.gridHeight) / 2 - 25 + restartButton.bounds.y, 200, 50
-               }, GREEN, BLACK, "Menu")
+               }, "Menu")
 
 {
     spawnFood();
@@ -77,18 +77,23 @@ void GameBase::update()
 
 void GameBase::draw()
 {
-    BeginDrawing();
-
-    ClearBackground(RAYWHITE);
+    // BeginDrawing();
+    //
+    // ClearBackground(RAYWHITE);
 
     switch (gameState)
     {
     case GameState::Start:
         {
             startButton.draw();
+            menuButton.draw();
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && startButton.isClicked(GetMousePosition()))
             {
                 gameState = GameState::Playing;
+            }
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
+            {
+                gameState = GameState::Menu;
             }
             break;
         }
@@ -129,8 +134,7 @@ void GameBase::draw()
             }
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
             {
-                restart();
-                gameState = GameState::Start;
+                gameState = GameState::Menu;
             }
             break;
         }
@@ -149,12 +153,12 @@ void GameBase::draw()
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
             {
                 restart();
-                gameState = GameState::Start;
+                gameState = GameState::Menu;
             }
             break;
         }
     }
-    EndDrawing();
+    // EndDrawing();
 }
 
 void GameBase::spawnFood()

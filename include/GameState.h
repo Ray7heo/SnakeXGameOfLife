@@ -5,5 +5,6 @@ enum class GameState
     Start,
     Playing,
     Paused,
-    GameOver
+    GameOver,
+    Menu
 };

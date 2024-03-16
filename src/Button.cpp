@@ -1,9 +1,14 @@
 ﻿#include "../include/Button.h"
 
-Button::Button(const Rectangle& bounds, const Color& color, const Color& text_color, std::string text): bounds(bounds),
-    color(color),
-    textColor(text_color),
-    text(std::move(text))
+Button::Button(const Rectangle& bounds, std::string text): bounds(bounds), color(GREEN), textColor(BLACK),
+                                                           text(std::move(text))
+{
+}
+
+Button::Button(const Rectangle& bounds, const Color& color, const Color& textColor, std::string text): bounds(bounds),
+                                                                                                       color(color),
+                                                                                                       textColor(textColor),
+                                                                                                       text(std::move(text))
 {
 }
 
