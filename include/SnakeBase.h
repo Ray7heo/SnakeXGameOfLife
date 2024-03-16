@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <vector>
+#include <queue>
+#include <unordered_map>
 
 #include "Config.h"
 #include "../lib/RayLib/raylib.h"
@@ -13,14 +15,13 @@ public:
     Color color;
     bool isDead;
     Vector2 direction;
-    
+
     SnakeBase(const Color& color, const Config& config);
     virtual void move();
     virtual void autoMove(Vector2& foodPosition);
     void draw() const;
     void grow();
     Rectangle getCollisionRec() const;
-    
 
 protected:
     Config config;

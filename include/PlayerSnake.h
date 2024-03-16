@@ -8,4 +8,5 @@ class PlayerSnake final : public SnakeBase
 public:
     PlayerSnake(const Color& snakeColor, const Config& config);
     void move() override;
+    void autoMove(Vector2& foodPosition) override;
 };

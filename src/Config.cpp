@@ -1,14 +1,14 @@
 ﻿#include "../include/Config.h"
 
-Config::Config(int screen_width, int screen_height, int square_size): screenWidth(screen_width),
-                                                                      screenHeight(screen_height),
-                                                                      squareSize(square_size)
+Config::Config(int gridWidth, int gridHeight, int tileSize): gridWidth(gridWidth),
+                                                                      gridHeight(gridHeight),
+                                                                      tileSize(tileSize)
 {
 }
 
 Config::Config()
 {
-    screenWidth = 800;
-    screenHeight = 450;
-    squareSize = 30;
+    gridWidth = 50;
+    gridHeight = 30;
+    tileSize = 30;
 }

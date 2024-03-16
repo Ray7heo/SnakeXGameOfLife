@@ -1,19 +1,22 @@
 ﻿#include "../include/Game.h"
-
 #include "../include/AutoSnake.h"
 
 // no arg
-Game::Game() : snake(std::make_unique<PlayerSnake>(GREEN, config)), food({400, 200}),
+Game::Game() : config(Config()), snake(std::make_unique<AutoSnake>(RED, config)),
+               food({static_cast<float>(config.gridWidth) / 2, static_cast<float>(config.gridHeight) / 2}),
                gameState(GameState::Start),
-               startButton({400 - 100, 225 - 25, 200, 50}, GREEN, BLACK, "Start"),
-               pauseButton({static_cast<float>(config.screenWidth) - 120, 10, 100, 30},GREEN, BLACK, "Pause"),
+               startButton({
+                               static_cast<float>(config.gridWidth) / 2 * config.tileSize - 100,
+                               static_cast<float>(15 * config.tileSize) - 25, 200, 50
+                           }, GREEN, BLACK, "Start"),
+               pauseButton({static_cast<float>(config.gridWidth) - 120, 10, 100, 30},GREEN, BLACK, "Pause"),
                restartButton({
-                                 static_cast<float>(config.screenWidth) / 2 - 100,
-                                 static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
+                                 static_cast<float>(config.gridWidth) / 2 - 100,
+                                 static_cast<float>(config.gridHeight) / 2 - 25, 200, 50
                              },GREEN,BLACK, "Restart"),
                menuButton({
-                              static_cast<float>(config.screenWidth) / 2 - 100,
-                              static_cast<float>(config.screenHeight) / 2 - 25 + restartButton.bounds.height,
+                              static_cast<float>(config.gridWidth) / 2 - 100,
+                              static_cast<float>(config.gridHeight) / 2 - 25 + restartButton.bounds.height,
                               200, 50
                           }, GREEN, BLACK, "Menu"),
                score(0)
@@ -21,28 +24,33 @@ Game::Game() : snake(std::make_unique<PlayerSnake>(GREEN, config)), food({400, 2
 {
 }
 
+
 Game::Game(const Config& config, SnakeBase& snake): config(config),
                                                     snake(&snake),
                                                     food({
-                                                        static_cast<float>(config.screenWidth) / 2,
-                                                        static_cast<float>(config.screenHeight) / 2
+                                                        static_cast<float>(config.gridWidth) / 2,
+                                                        static_cast<float>(config.gridHeight) / 2
                                                     }),
                                                     gameState(GameState::Start),
-                                                    startButton({400 - 100, 225 - 25, 200, 50}, GREEN, BLACK, "Start"),
+                                                    startButton({
+                                                                    static_cast<float>(25 * config.tileSize) - 100,
+                                                                    static_cast<float>(15 * config.tileSize) - 25, 200,
+                                                                    50
+                                                                }, GREEN, BLACK, "Start"),
                                                     pauseButton({
-                                                                    static_cast<float>(config.screenWidth) - 120, 10,
+                                                                    static_cast<float>(config.gridWidth) - 120, 10,
                                                                     100, 30
                                                                 },
                                                                 GREEN, BLACK, "Pause"),
                                                     restartButton({
-                                                                      static_cast<float>(config.screenWidth) / 2 - 100,
-                                                                      static_cast<float>(config.screenHeight) / 2 - 25,
+                                                                      static_cast<float>(config.gridWidth) / 2 - 100,
+                                                                      static_cast<float>(config.gridHeight) / 2 - 25,
                                                                       200,
                                                                       50
                                                                   },GREEN,BLACK, "Restart"),
                                                     menuButton({
-                                                                   static_cast<float>(config.screenWidth) / 2 - 100,
-                                                                   static_cast<float>(config.screenHeight) / 2 - 25 +
+                                                                   static_cast<float>(config.gridWidth) / 2 - 100,
+                                                                   static_cast<float>(config.gridHeight) / 2 - 25 +
                                                                    restartButton.bounds.y,
                                                                    200,
                                                                    50
@@ -60,19 +68,20 @@ void Game::update()
     case GameState::Start:
         break;
     case GameState::Playing:
-        snake->move();
-    // auto v = Vector2{food.x, food.y};
-    // snake->autoMove(v);
+        // snake->move();
+        auto v = Vector2{food.x, food.y};
+        snake->autoMove(v);
 
     // Check collision with food
         if (CheckCollisionRecs(snake->getCollisionRec(), {
-                                   food.x, food.y, static_cast<float>(config.squareSize),
-                                   static_cast<float>(config.squareSize)
+                                   food.x * config.tileSize, food.y * config.tileSize,
+                                   static_cast<float>(config.tileSize),
+                                   static_cast<float>(config.tileSize)
                                }))
         {
             score++;
             snake->grow();
-            spawn_food();
+            spawnFood();
         }
 
         if (snake->isDead)
@@ -93,7 +102,6 @@ void Game::draw()
 
     ClearBackground(RAYWHITE);
 
-
     switch (gameState)
     {
     case GameState::Start:
@@ -108,7 +116,7 @@ void Game::draw()
     case GameState::Playing:
         {
             // draw food
-            DrawRectangle(food.x, food.y, config.squareSize, config.squareSize, GREEN);
+            DrawRectangle(food.x * config.tileSize, food.y * config.tileSize, config.tileSize, config.tileSize, GREEN);
             // draw snake
             snake->draw();
             // draw score
@@ -131,8 +139,8 @@ void Game::draw()
             sprintf_s(scoreText, "Score: %d", score);
             DrawText(scoreText, 10, 10, 20, BLACK);
             DrawText("Pause !",
-                     config.screenWidth / 2 - MeasureText("Pause !", 30) / 2,
-                     config.screenHeight / 2 - 20, 30, RED);
+                     config.gridWidth / 2 - MeasureText("Pause !", 30) / 2,
+                     config.gridHeight / 2 - 20, 30, RED);
             pauseButton.text = "resume";
             pauseButton.draw();
             menuButton.draw();
@@ -142,8 +150,7 @@ void Game::draw()
             }
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
             {
-                snake = std::make_unique<PlayerSnake>(snake->color, config);
-                score = 0;
+                spawnFood();
                 gameState = GameState::Start;
             }
             break;
@@ -153,18 +160,16 @@ void Game::draw()
             restartButton.draw();
             menuButton.draw();
             DrawText("GameOver !",
-                     config.screenWidth / 2 - MeasureText("GameOver !", 30) / 2,
-                     config.screenHeight / 2 - restartButton.bounds.height, 30, RED);
+                     config.gridWidth - MeasureText("GameOver !", 30) / 2,
+                     config.gridHeight - restartButton.bounds.height, 30, RED);
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && restartButton.isClicked(GetMousePosition()))
             {
-                snake = std::make_unique<PlayerSnake>(snake->color, config);
-                score = 0;
+                restart();
                 gameState = GameState::Playing;
             }
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
             {
-                snake = std::make_unique<PlayerSnake>(snake->color, config);
-                score = 0;
+                restart();
                 gameState = GameState::Start;
             }
             break;
@@ -173,8 +178,15 @@ void Game::draw()
     EndDrawing();
 }
 
-void Game::spawn_food()
+void Game::spawnFood()
 {
-    food.x = GetRandomValue(0, config.screenWidth / config.squareSize - 1) * config.squareSize;
-    food.y = GetRandomValue(0, config.screenHeight / config.squareSize - 1) * config.squareSize;
+    food.x = GetRandomValue(0, config.gridWidth - 1);
+    food.y = GetRandomValue(0, config.gridHeight - 1);
+}
+
+void Game::restart()
+{
+    spawnFood();
+    snake = std::make_unique<AutoSnake>(snake->color, config);
+    score = 0;
 }

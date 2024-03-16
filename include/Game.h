@@ -22,9 +22,11 @@ public:
     Game(const Config& config, SnakeBase& snake);
 
     Game();
+
+    void restart();
     void update();
     void draw();
 
 private:
-    void spawn_food();
+    void spawnFood();
 };

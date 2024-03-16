@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "AStart.h"
+#include <unordered_map>
 #include "SnakeBase.h"
 
 class AutoSnake final : public SnakeBase
@@ -12,5 +12,6 @@ public:
     void autoMove(Vector2& foodPosition) override;
 
 private:
-    AStar aStar;
+    std::vector<Vector2> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    std::vector<Vector2> findPath(const Vector2& start, const Vector2& end) const;
 };

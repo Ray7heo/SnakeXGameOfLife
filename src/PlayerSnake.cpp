@@ -30,4 +30,8 @@ void PlayerSnake::move()
     SnakeBase::move();
 }
 
+void PlayerSnake::autoMove(Vector2& foodPosition)
+{
+}
+
 

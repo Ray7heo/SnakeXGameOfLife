@@ -1,28 +1,30 @@
 ﻿#include "../include/SnakeBase.h"
 
+
 SnakeBase::SnakeBase(const Color& color, const Config& config):
     color(color), isDead(false), direction(Vector2{1, 0}),
     config(config)
 {
-    position = Vector2{static_cast<float>(config.screenWidth) / 2, static_cast<float>(config.screenHeight) / 2};
+    position = Vector2{
+        static_cast<float>(config.gridWidth - config.tileSize), static_cast<float>(config.gridHeight) / 2
+    };
     body.push_back(position);
 }
 
 void SnakeBase::move()
 {
-    position.x += this->direction.x * config.squareSize;
-    position.y += this->direction.y * config.squareSize;
+    position.x += this->direction.x * config.tileSize;
+    position.y += this->direction.y * config.tileSize;
 
     // Move body
     for (int i = body.size() - 1; i > 0; i--)
     {
         body[i] = body[i - 1];
     }
-    body[0] = position;
-
 
     // Check collision with walls
-    if (position.x >= config.screenWidth || position.x < 0 || position.y >= config.screenHeight || position.y < 0)
+    if (position.x >= config.gridWidth * config.tileSize || position.x < 0 || position.y >= config.gridHeight * config.
+        tileSize || position.y < 0)
     {
         isDead = true;
     }
@@ -41,25 +43,30 @@ void SnakeBase::move()
     }
 }
 
+
 void SnakeBase::autoMove(Vector2& foodPosition)
 {
+    
 }
 
 void SnakeBase::draw() const
 {
     // draw head
-    DrawRectangle(position.x, position.y, config.squareSize, config.squareSize, BLUE);
+    DrawRectangle(body.front().x * config.tileSize, body.front().y * config.tileSize, config.tileSize, config.tileSize,
+                  BLUE);
 
     // draw body
     for (size_t i = 1; i < body.size() - 1; i++)
     {
-        DrawRectangle(body[i].x, body[i].y, config.squareSize, config.squareSize, color);
+        DrawRectangle(body[i].x * config.tileSize, body[i].y * config.tileSize, config.tileSize, config.tileSize,
+                      color);
     }
 
+    // draw tail
     if (body.size() > 1)
     {
-        DrawRectangle(body[body.size() - 1].x, body[body.size() - 1].y, config.squareSize, config.squareSize,
-                      BLACK);
+        DrawRectangle(body.back().x * config.tileSize, body.back().y * config.tileSize,
+                      config.tileSize, config.tileSize, BLACK);
     }
 }
 
@@ -70,5 +77,8 @@ void SnakeBase::grow()
 
 Rectangle SnakeBase::getCollisionRec() const
 {
-    return {position.x, position.y, static_cast<float>(config.squareSize), static_cast<float>(config.squareSize)};
+    return {
+        body.front().x * static_cast<float>(config.tileSize), body.front().y * static_cast<float>(config.tileSize), static_cast<float>(config.tileSize),
+        static_cast<float>(config.tileSize)
+    };
 }
