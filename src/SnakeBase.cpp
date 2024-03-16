@@ -1,30 +1,23 @@
 ﻿#include "../include/SnakeBase.h"
 
 
-SnakeBase::SnakeBase(const Color& color, const Config& config):
-    color(color), isDead(false), direction(Vector2{1, 0}),
+SnakeBase::SnakeBase(const Color& headColor, const Color& tailColor,const Config& config, const Vector2 startPosition):
+    headColor(headColor), tailColor(tailColor), isDead(false), direction(Vector2{1, 0}),
     config(config)
 {
-    position = Vector2{
-        static_cast<float>(config.gridWidth - config.tileSize), static_cast<float>(config.gridHeight) / 2
-    };
-    body.push_back(position);
+    body.push_back(startPosition);
 }
 
 void SnakeBase::move()
 {
-    position.x += this->direction.x * config.tileSize;
-    position.y += this->direction.y * config.tileSize;
-
     // Move body
-    for (int i = body.size() - 1; i > 0; i--)
-    {
-        body[i] = body[i - 1];
-    }
+    const auto nexPos = Vector2{body.front().x + direction.x,body.front().y + direction.y};
+    body.insert(body.begin(), nexPos);
+    body.pop_back();
 
     // Check collision with walls
-    if (position.x >= config.gridWidth * config.tileSize || position.x < 0 || position.y >= config.gridHeight * config.
-        tileSize || position.y < 0)
+    if (body.front().x >= static_cast<float>(config.gridWidth) || body.front().x < 0 || body.front().y >= static_cast<float>(config.gridHeight) || body.front().
+        y < 0)
     {
         isDead = true;
     }
@@ -34,7 +27,7 @@ void SnakeBase::move()
     {
         for (size_t i = 1; i < body.size(); i++)
         {
-            if (position.x == body[i].x && position.y == body[i].y)
+            if (body.front().x == body[i].x && body.front().y == body[i].y)
             {
                 isDead = true;
                 break;
@@ -46,27 +39,26 @@ void SnakeBase::move()
 
 void SnakeBase::autoMove(Vector2& foodPosition)
 {
-    
 }
 
 void SnakeBase::draw() const
 {
     // draw head
     DrawRectangle(body.front().x * config.tileSize, body.front().y * config.tileSize, config.tileSize, config.tileSize,
-                  BLUE);
+                  headColor);
 
     // draw body
     for (size_t i = 1; i < body.size() - 1; i++)
     {
         DrawRectangle(body[i].x * config.tileSize, body[i].y * config.tileSize, config.tileSize, config.tileSize,
-                      color);
+                      GREEN);
     }
 
     // draw tail
     if (body.size() > 1)
     {
         DrawRectangle(body.back().x * config.tileSize, body.back().y * config.tileSize,
-                      config.tileSize, config.tileSize, BLACK);
+                      config.tileSize, config.tileSize, tailColor);
     }
 }
 
@@ -78,7 +70,8 @@ void SnakeBase::grow()
 Rectangle SnakeBase::getCollisionRec() const
 {
     return {
-        body.front().x * static_cast<float>(config.tileSize), body.front().y * static_cast<float>(config.tileSize), static_cast<float>(config.tileSize),
+        body.front().x * static_cast<float>(config.tileSize), body.front().y * static_cast<float>(config.tileSize),
+        static_cast<float>(config.tileSize),
         static_cast<float>(config.tileSize)
     };
 }

@@ -5,7 +5,7 @@
 class AutoSnake final : public SnakeBase
 {
 public:
-    AutoSnake(const Color& color, const Config& config);
+    AutoSnake(const Color& headColor, const Color& tailColor, const Config& config, Vector2 startPosition);
 
     void move() override;
 

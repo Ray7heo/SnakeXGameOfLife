@@ -6,7 +6,10 @@
 class PlayerSnake final : public SnakeBase
 {
 public:
-    PlayerSnake(const Color& snakeColor, const Config& config);
+    PlayerSnake(const Color& headColor, const Color& tailColor, const Config& config, const Vector2& startPosition);
+
     void move() override;
     void autoMove(Vector2& foodPosition) override;
+private:
+    bool useArrowInput;
 };

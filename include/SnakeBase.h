@@ -10,13 +10,13 @@ class SnakeBase
 {
 public:
     virtual ~SnakeBase() = default;
-    Vector2 position;
     std::vector<Vector2> body;
-    Color color;
+    Color headColor;
+    Color tailColor;
     bool isDead;
     Vector2 direction;
 
-    SnakeBase(const Color& color, const Config& config);
+    SnakeBase(const Color& headColor, const Color& tailColor, const Config& config, const Vector2 startPosition);
     virtual void move();
     virtual void autoMove(Vector2& foodPosition);
     void draw() const;

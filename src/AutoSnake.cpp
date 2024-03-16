@@ -1,6 +1,7 @@
 ﻿#include "../include/AutoSnake.h"
 
-AutoSnake::AutoSnake(const Color& color, const Config& config): SnakeBase(color, config)
+AutoSnake::AutoSnake(const Color& headColor, const Color& tailColor, const Config& config,
+                     const Vector2 startPosition): SnakeBase(headColor, tailColor, config, startPosition)
 {
 }
 
@@ -22,7 +23,7 @@ void AutoSnake::autoMove(Vector2& foodPosition)
     {
         // random move
         int direction = GetRandomValue(0, 3);
-        Vector2 nextPos = {body[0].x + directions[direction].x, body[0].y + directions[direction].y};
+        Vector2 nextPos = {body.front().x + directions[direction].x, body.front().y + directions[direction].y};
         body.insert(body.begin(), nextPos);
         body.pop_back();
     }
