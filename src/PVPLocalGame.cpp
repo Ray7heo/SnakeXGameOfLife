@@ -27,22 +27,6 @@ void PVPLocalGame::update()
         rightSnake->move();
         snake->move();
 
-        const auto it = std::find_if(cells.begin(), cells.end(), FindCellByPosition(Vector2{rightSnake->body.front()}));
-        if (it != cells.end())
-        {
-            if (it->type == CellType::Edible)
-            {
-                rightScore += 3;
-                rightSnake->grow();
-                cells.erase(it);
-            }
-            else if (it->type == CellType::Rot)
-            {
-                rightScore += 1;
-                rightSnake->shrink();
-                cells.erase(it);
-            }
-        }
         if (rightSnake->isDead)
         {
             gameState = GameState::GameOver;

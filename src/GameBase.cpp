@@ -18,23 +18,12 @@ GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
                                       static_cast<float>(config.screenWidth) / 2 - 100,
                                       restartButton.bounds.y + restartButton.bounds.height, 200, 50
                                   }, "Menu"),
-                       cells(std::vector<Cell>())
+                       cells(std::vector<std::vector<std::shared_ptr<Cell>>>(config.gridWidth,
+                                                                             std::vector<std::shared_ptr<Cell>>(
+                                                                                 config.gridHeight)))
 
 {
-    randomCell();
-
-    std::thread t([&]()
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        for (auto& cell : cells)
-        {
-            if (cell.type == CellType::Edible)
-            {
-                cell.type = CellType::Rot;
-            }
-        }
-    });
-    t.join();
+    // randomCell();
 }
 
 
@@ -56,48 +45,35 @@ GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
                    static_cast<float>(config.screenWidth) / 2 - 100,
                    restartButton.bounds.y + restartButton.bounds.height, 200, 50
                }, "Menu"),
-    cells(std::vector<Cell>())
+    cells(std::vector<std::vector<std::shared_ptr<Cell>>>(config.gridWidth,
+                                                          std::vector<std::shared_ptr<Cell>>(config.gridHeight)))
 
 {
     randomCell();
-    std::thread t([&]()
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        for (auto& cell : cells)
-        {
-            if (cell.type == CellType::Edible)
-            {
-                cell.type = CellType::Rot;
-            }
-        }
-    });
-    t.detach();
 }
-
 
 
 void GameBase::update()
 {
     if (gameState == GameState::Playing)
     {
-        // Check collision with food
-        const auto it = std::find_if(cells.begin(), cells.end(), FindCellByPosition(Vector2{snake->body.front()}));
-        if (it != cells.end())
+        if (snake->body.front().x >= 0)
         {
-            if (it->type == CellType::Edible)
+            // Check collision with food
+            const auto cell = cells[static_cast<int>(snake->body.front().y)][static_cast<int>(snake->body.front().x)];
+            if (cell->type == CellType::Edible)
             {
                 score += 3;
                 snake->grow();
-                cells.erase(it);
+                cell->type = CellType::Blank;
             }
-            else if (it->type == CellType::Rot)
+            else if (cell->type == CellType::Rot)
             {
                 score += 1;
                 snake->shrink();
-                cells.erase(it);
+                cell->type = CellType::Blank;
             }
         }
-
 
         if (snake->isDead)
         {
@@ -136,9 +112,12 @@ void GameBase::draw()
                 DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
             }
             // draw cell
-            for (const auto& cell : cells)
+            for (const auto& yCell : cells)
             {
-                cell.draw();
+                for (const auto& xCell : yCell)
+                {
+                    xCell->draw();
+                }
             }
             // draw snake
             snake->draw();
@@ -199,25 +178,6 @@ void GameBase::draw()
     }
 }
 
-GameBase::FindCellByPosition::FindCellByPosition(Vector2 targetPos): targetPos(targetPos)
-{
-}
-
-bool GameBase::FindCellByPosition::operator()(const Cell& cell) const
-{
-    return cell.position.x == targetPos.x && cell.position.y == targetPos.y;
-}
-
-GameBase::FindCellByType::FindCellByType(const CellType& type): type(type)
-{
-}
-
-bool GameBase::FindCellByType::operator()(const Cell& cell) const
-{
-    return type == cell.type;
-}
-
-
 void GameBase::restart()
 {
     randomCell();
@@ -229,54 +189,21 @@ void GameBase::randomCell()
     cells.clear();
     // 计算权重总和
     const std::vector<WeightedCell> weightedCells = {
-        {CellType::Blank, 40},
+        {CellType::Blank, 800},
         {CellType::Edible, 20},
         {CellType::Rot, 20},
         {CellType::Die, 15},
         {CellType::Wall, 5},
     };
 
-    for (int i = 0; i < config.gridHeight * 3; ++i)
+    for (int y = 0; y < config.gridHeight; y++)
     {
-        int totalWeight = 0;
-        for (const auto& cell : weightedCells)
+        cells.emplace_back();
+        for (int x = 0; x < config.gridWidth; x++)
         {
-            totalWeight += cell.weight;
-        }
-        // 生成随机数
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> dist(1, totalWeight);
-        const int randomNumber = dist(gen);
-
-        int cumulativeWeight = 0;
-        for (const auto& cell : weightedCells)
-        {
-            cumulativeWeight += cell.weight;
-            if (randomNumber <= cumulativeWeight)
-            {
-                cells.emplace_back(cell.type, randomCellPosition(), config);
-            }
-        }
-        cells.emplace_back(CellType::Blank, randomCellPosition(), config);
-    }
-}
-
-Vector2 GameBase::randomCellPosition()
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<unsigned int> xDist(5, config.gridWidth - 5);
-    std::uniform_int_distribution<unsigned int> yDist(5, config.gridHeight - 5);
-
-    const auto randomPos = Vector2{static_cast<float>(xDist(gen)), static_cast<float>(yDist(gen))};
-
-    for (const auto& cell : cells)
-    {
-        if (cell.position.x == randomPos.x && cell.position.y == randomPos.y)
-        {
-            return randomCellPosition();
+            cells[y].push_back(std::make_shared<Cell>(Cell::randomType(weightedCells),
+                                                      Vector2{static_cast<float>(x), static_cast<float>(y)},
+                                                      config));
         }
     }
-    return randomPos;
 }

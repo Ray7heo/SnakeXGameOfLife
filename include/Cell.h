@@ -38,6 +38,7 @@ public:
 
     void draw() const;
 
+    static CellType randomType(const std::vector<WeightedCell>& weightedCells);
 private:
     GameConfig config;
 };

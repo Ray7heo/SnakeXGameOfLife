@@ -6,7 +6,7 @@ SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake): GameBase(con
 
 SingleGame::SingleGame()
 {
-    snake = std::make_unique<PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
+    snake = std::make_unique<PlayerSnake>(RED,BLUE, config, Vector2{1, static_cast<float>(config.gridHeight / 2)});
 }
 
 void SingleGame::update()
@@ -26,5 +26,5 @@ void SingleGame::draw()
 void SingleGame::restart()
 {
     GameBase::restart();
-    snake = std::make_unique<PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
+    snake = std::make_unique<PlayerSnake>(RED,BLUE, config, Vector2{1, static_cast<float>(config.gridHeight / 2)});
 }

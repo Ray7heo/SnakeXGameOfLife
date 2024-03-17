@@ -37,40 +37,17 @@ public:
     virtual void draw();
 
 protected:
-    class FindCellByPosition
-    {
-    public:
-        explicit FindCellByPosition(Vector2 targetPos);
-
-        bool operator()(const Cell& cell) const;
-
-    private:
-        Vector2 targetPos;
-    };
-
-    class FindCellByType
-    {
-    public:
-        explicit FindCellByType(const CellType& type);
-
-        bool operator()(const Cell& cell) const;
-
-    private:
-        CellType type;
-    };
 
     std::unique_ptr<SnakeBase> snake;
     Button startButton;
     Button pauseButton;
     Button restartButton;
     Button menuButton;
-    std::vector<Cell> cells;
+    std::vector<std::vector<std::shared_ptr<Cell>>> cells;
 
-    void spawnFood();
     virtual void restart();
-
 
 private:
     void randomCell();
-    Vector2 randomCellPosition();
+    // static CellType randomType(const std::vector<WeightedCell>& weightedCells);
 };

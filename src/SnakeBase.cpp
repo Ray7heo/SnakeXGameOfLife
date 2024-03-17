@@ -45,22 +45,26 @@ void SnakeBase::autoMove(Vector2& foodPosition)
 
 void SnakeBase::draw() const
 {
-    // draw head
-    DrawRectangle(body.front().x * config.tileSize, body.front().y * config.tileSize, config.tileSize, config.tileSize,
-                  headColor);
-
-    // draw body
-    for (size_t i = 1; i < body.size() - 1; i++)
+    if (!isDead)
     {
-        DrawRectangle(body[i].x * config.tileSize, body[i].y * config.tileSize, config.tileSize, config.tileSize,
-                      GREEN);
-    }
+        // draw head
+        DrawRectangle(body.front().x * config.tileSize, body.front().y * config.tileSize, config.tileSize,
+                      config.tileSize,
+                      headColor);
 
-    // draw tail
-    if (body.size() > 1)
-    {
-        DrawRectangle(body.back().x * config.tileSize, body.back().y * config.tileSize,
-                      config.tileSize, config.tileSize, tailColor);
+        // draw body
+        for (size_t i = 1; i < body.size() - 1; i++)
+        {
+            DrawRectangle(body[i].x * config.tileSize, body[i].y * config.tileSize, config.tileSize, config.tileSize,
+                          GREEN);
+        }
+
+        // draw tail
+        if (body.size() > 1)
+        {
+            DrawRectangle(body.back().x * config.tileSize, body.back().y * config.tileSize,
+                          config.tileSize, config.tileSize, tailColor);
+        }
     }
 }
 
@@ -83,7 +87,6 @@ void SnakeBase::shrink()
 
 Rectangle SnakeBase::getCollisionRec() const
 {
-
     return {
         body.front().x * static_cast<float>(config.tileSize), body.front().y * static_cast<float>(config.tileSize),
         static_cast<float>(config.tileSize),

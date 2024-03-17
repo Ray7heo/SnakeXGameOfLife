@@ -24,29 +24,6 @@ void PVEGame::update()
 {
     if (gameState == GameState::Playing)
     {
-        const auto it = std::find_if(cells.begin(), cells.end(), FindCellByPosition(Vector2{autoSnake->body.front()}));
-        const auto food = std::find_if(cells.begin(), cells.end(), FindCellByType(CellType::Edible));
-        if (food != cells.end())
-        {
-            autoSnake->autoMove(food->position);
-        }
-        snake->move();
-
-        if (it != cells.end())
-        {
-            if (it->type == CellType::Edible)
-            {
-                autoScore += 3;
-                autoSnake->grow();
-                cells.erase(it);
-            }
-            else if (it->type == CellType::Rot)
-            {
-                autoScore += 1;
-                autoSnake->shrink();
-                cells.erase(it);
-            }
-        }
 
 
         if (autoSnake->isDead)
@@ -85,11 +62,6 @@ void PVEGame::restart()
                                                 static_cast<float>(config.gridWidth),
                                                 static_cast<float>(config.gridHeight / 2)
                                             });
-    const auto food = std::find_if(cells.begin(), cells.end(), FindCellByType(CellType::Edible));
-    if (food != cells.end())
-    {
-        autoSnake->autoMove(food->position);
-    }
     snake = std::make_unique<
         PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
 }
