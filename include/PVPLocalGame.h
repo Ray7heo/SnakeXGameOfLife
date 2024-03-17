@@ -6,7 +6,7 @@ class PVPLocalGame :public GameBase
 public:
     PVPLocalGame();
 
-    PVPLocalGame(const Config& config, SnakeBase& leftSnake, SnakeBase& rightSnake);
+    PVPLocalGame(const GameConfig& config, SnakeBase& leftSnake, SnakeBase& rightSnake);
 
     void update() override;
     void draw() override;

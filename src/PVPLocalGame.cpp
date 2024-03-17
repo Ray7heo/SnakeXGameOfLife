@@ -3,17 +3,17 @@
 PVPLocalGame::PVPLocalGame(): rightScore(0)
 {
     rightSnake = std::make_unique<PlayerSnake>(BLUE,BLACK, config, Vector2{
-                                                  static_cast<float>(config.gridWidth - 1),
-                                                  static_cast<float>(config.gridHeight / 2)
-                                              }, true);
+                                                   static_cast<float>(config.gridWidth - 1),
+                                                   static_cast<float>(config.gridHeight / 2)
+                                               }, true);
 
 
     snake = std::make_unique<
         PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)}, false);
 }
 
-PVPLocalGame::PVPLocalGame(const Config& config, SnakeBase& leftSnake, SnakeBase& rightSnake):
-    GameBase(config, leftSnake),rightSnake(&rightSnake),
+PVPLocalGame::PVPLocalGame(const GameConfig& config, SnakeBase& leftSnake, SnakeBase& rightSnake):
+    GameBase(config, leftSnake), rightSnake(&rightSnake),
     rightScore(0)
 {
 }
@@ -50,8 +50,14 @@ void PVPLocalGame::draw()
     {
         rightSnake->draw();
         // draw score
-        char scoreText[20];
-        sprintf_s(scoreText, "AI Score: %d", rightScore);
+        char scoreText[30];
+        sprintf_s(scoreText, "RightPlayer Score: %d", rightScore);
+        DrawText(scoreText, 10, 30, 20, BLACK);
+    }
+    else if (gameState == GameState::Paused)
+    {
+        char scoreText[30];
+        sprintf_s(scoreText, "RightPlayer Score: %d", rightScore);
         DrawText(scoreText, 10, 30, 20, BLACK);
     }
     GameBase::draw();

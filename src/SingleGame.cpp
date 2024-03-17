@@ -1,6 +1,6 @@
 ﻿#include "../include/SingleGame.h"
 
-SingleGame::SingleGame(const Config& config, SnakeBase& snake): GameBase(config, snake)
+SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake)
 {
 }
 

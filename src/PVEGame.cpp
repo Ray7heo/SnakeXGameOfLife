@@ -14,8 +14,12 @@ PVEGame::PVEGame(): autoScore(0)
         PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
 }
 
-PVEGame::PVEGame(const Config& config, SnakeBase& snake): GameBase(config, snake), autoScore(0)
+PVEGame::PVEGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake), autoScore(0)
 {
+    autoSnake = std::make_unique<AutoSnake>(BLUE,BLACK, config, Vector2{
+                                              static_cast<float>(config.gridWidth),
+                                              static_cast<float>(config.gridHeight / 2)
+                                          });
 }
 
 void PVEGame::update()
@@ -49,6 +53,12 @@ void PVEGame::draw()
     {
         autoSnake->draw();
         // draw score
+        char scoreText[20];
+        sprintf_s(scoreText, "AI Score: %d", autoScore);
+        DrawText(scoreText, 10, 30, 20, BLACK);
+    }
+    else if (gameState == GameState::Paused)
+    {
         char scoreText[20];
         sprintf_s(scoreText, "AI Score: %d", autoScore);
         DrawText(scoreText, 10, 30, 20, BLACK);

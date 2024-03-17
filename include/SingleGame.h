@@ -5,7 +5,7 @@ class SingleGame final : public GameBase
 {
 public:
     SingleGame();
-    SingleGame(const Config& config, SnakeBase& snake);
+    SingleGame(const GameConfig& config, SnakeBase& snake);
 
     void update() override;
     void draw() override;

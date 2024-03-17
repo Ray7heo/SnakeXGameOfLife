@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <thread>
-#include "Config.h"
 #include <raylib.h>
-#include "../include/Config.h"
+
+#include "../include/GameConfig.h"
 #include "../include/SingleGame.h"
 #include "../include/PVPLocalGame.h"
 #include "../include/PVEGame.h"
@@ -12,16 +12,16 @@
 class Menu
 {
 public:
-    explicit Menu(const Config& config);
+    explicit Menu(const GameConfig& config);
     void update();
 
 private:
-    Config config;
+    GameConfig config;
     std::unique_ptr<GameBase> game;
-    Button singleGameButton;
-    Button pveGameButton;
-    Button pvpLocalGameButton;
     Button lanGameButton;
+    Button pvpLocalGameButton;
+    Button pveGameButton;
+    Button singleGameButton;
 
     void drawGame() const;
     void selectGameMode();

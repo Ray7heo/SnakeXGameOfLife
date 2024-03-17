@@ -1,7 +1,7 @@
 ﻿#include "../include/SnakeBase.h"
 
 
-SnakeBase::SnakeBase(const Color& headColor, const Color& tailColor,const Config& config, const Vector2 startPosition):
+SnakeBase::SnakeBase(const Color& headColor, const Color& tailColor,const GameConfig& config, const Vector2 startPosition):
     headColor(headColor), tailColor(tailColor), isDead(false), direction(Vector2{0, 0}),
     config(config)
 {

@@ -6,5 +6,5 @@ class LANGame final : public GameBase
 public:
     LANGame();
 
-    LANGame(const Config& config, SnakeBase& snake);
+    LANGame(const GameConfig& config, SnakeBase& snake);
 };

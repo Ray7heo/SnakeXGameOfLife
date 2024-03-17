@@ -5,7 +5,7 @@ class PVEGame final : public GameBase
 {
 public:
     PVEGame();
-    PVEGame(const Config& config, SnakeBase& snake);
+    PVEGame(const GameConfig& config, SnakeBase& snake);
 
     void update() override;
     void draw() override;

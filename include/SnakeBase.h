@@ -2,7 +2,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
-#include "Config.h"
+#include "GameConfig.h"
 #include <raylib.h>
 
 class SnakeBase
@@ -15,7 +15,7 @@ public:
     bool isDead;
     Vector2 direction;
 
-    SnakeBase(const Color& headColor, const Color& tailColor, const Config& config, Vector2 startPosition);
+    SnakeBase(const Color& headColor, const Color& tailColor, const GameConfig& config, Vector2 startPosition);
     virtual void move();
     virtual void autoMove(Vector2& foodPosition);
     void draw() const;
@@ -23,5 +23,5 @@ public:
     Rectangle getCollisionRec() const;
 
 protected:
-    Config config;
+    GameConfig config;
 };

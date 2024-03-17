@@ -1,6 +1,6 @@
 ﻿#include "../include/AutoSnake.h"
 
-AutoSnake::AutoSnake(const Color& headColor, const Color& tailColor, const Config& config,
+AutoSnake::AutoSnake(const Color& headColor, const Color& tailColor, const GameConfig& config,
                      const Vector2 startPosition): SnakeBase(headColor, tailColor, config, startPosition)
 {
 }

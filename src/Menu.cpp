@@ -1,32 +1,30 @@
 ﻿#include "../include/Menu.h"
 
 
-Menu::Menu(const Config& config):
+Menu::Menu(const GameConfig& config):
     config(config),
-    singleGameButton({
-                         static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) - 100,
-                         static_cast<float>(config.gridHeight - 8) * static_cast<float>(config.tileSize) - 30, 200, 50
-                     }, "Single"),
-    pveGameButton({
-                      static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) - 100,
-                      static_cast<float>(config.gridHeight - 6) * static_cast<float>
-                      (config.tileSize) - 30,
-                      200, 50
-                  }, "PVE"),
-    pvpLocalGameButton({
-                           static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) - 100,
-                           static_cast<float>(config.gridHeight - 4) * static_cast<float>(config.tileSize) - 30, 200, 50
-                       }, "PVP Local"),
     lanGameButton({
-                      static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) - 100,
-                      static_cast<float>(config.gridHeight - 2) * static_cast<float>(config.tileSize) - 25, 200, 50
-                  }, "PVP LAN")
+                      static_cast<float>(config.screenWidth) / 2 - 100,
+                      static_cast<float>(config.screenHeight) - 50, 200, 50
+                  }, "PVP LAN"),
+    pvpLocalGameButton({
+                           static_cast<float>(config.screenWidth) / 2 - 100,
+                           lanGameButton.bounds.y - 50, 200, 50
+                       }, "PVP Local"),
+    pveGameButton({
+                      static_cast<float>(config.screenWidth) / 2 - 100,
+                      pvpLocalGameButton.bounds.y - 50, 200, 50
+                  }, "PVE"),
+    singleGameButton({
+                         static_cast<float>(config.screenWidth) / 2 - 100,
+                         pveGameButton.bounds.y - 50, 200, 50
+                     }, "Single")
 {
+    InitWindow(config.screenWidth, config.screenHeight, "Snake X Game of Life");
 }
 
 void Menu::update()
 {
-    InitWindow(config.gridWidth * config.tileSize, config.gridHeight * config.tileSize, "Snake X Game of Life");
     SetTargetFPS(10);
 
     while (!WindowShouldClose())
@@ -64,19 +62,31 @@ void Menu::selectGameMode()
         pveGameButton.draw();
         lanGameButton.draw();
         DrawText("Snake X Game of Life",
-                 config.gridWidth / 2 * config.tileSize - MeasureText("Snake X Game of Life", 50) / 2,
-                 config.gridHeight / 2 * config.tileSize, 50, RED);
+                 config.screenWidth / 2 - MeasureText("Snake X Game of Life", 50) / 2,
+                 config.screenHeight / 2, 50, RED);
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && singleGameButton.isClicked(GetMousePosition()))
         {
-            game = std::make_unique<SingleGame>();
+            const auto snake = new PlayerSnake(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight) / 2});
+            game = std::make_unique<SingleGame>(
+                config, *snake);
         }
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pvpLocalGameButton.isClicked(GetMousePosition()))
         {
-            game = std::make_unique<PVPLocalGame>();
+            const auto leftSnake = new PlayerSnake(RED,BLUE, config, Vector2{
+                                                       0, static_cast<float>(config.gridHeight) / 2
+                                                   });
+            const auto rightSnake = new PlayerSnake(BLUE,BLACK, config, Vector2{
+                                                        static_cast<float>(config.gridWidth - 1),
+                                                        static_cast<float>(config.gridHeight) / 2
+                                                    }, true);
+            game = std::make_unique<PVPLocalGame>(config, *leftSnake, *rightSnake);
         }
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pveGameButton.isClicked(GetMousePosition()))
         {
-            game = std::make_unique<PVEGame>();
+            const auto snake = new PlayerSnake(RED,BLUE, config, Vector2{
+                                                   0, static_cast<float>(config.gridHeight) / 2
+                                               });
+            game = std::make_unique<PVEGame>(config, *snake);
         }
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && lanGameButton.isClicked(GetMousePosition()))
         {

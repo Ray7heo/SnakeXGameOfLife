@@ -4,6 +4,6 @@ LANGame::LANGame()
 {
 }
 
-LANGame::LANGame(const Config& config, SnakeBase& snake): GameBase(config, snake)
+LANGame::LANGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake)
 {
 }

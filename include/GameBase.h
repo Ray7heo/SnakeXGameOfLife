@@ -3,20 +3,28 @@
 #include <raylib.h>
 
 #include "Button.h"
-#include "GameState.h"
 #include "PlayerSnake.h"
+
+enum class GameState
+{
+    Start,
+    Playing,
+    Paused,
+    GameOver,
+    Menu
+};
 
 class GameBase
 {
 public:
     virtual ~GameBase() = default;
-    Config config;
+    GameConfig config;
     GameState gameState;
     int score;
 
     GameBase();
     
-    GameBase(const Config& config, SnakeBase& snake);
+    GameBase(const GameConfig& config, SnakeBase& snake);
 
     virtual void update();
     virtual void draw();

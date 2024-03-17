@@ -1,7 +1,7 @@
 ﻿#include "../include/PlayerSnake.h"
 
 
-PlayerSnake::PlayerSnake(const Color& headColor, const Color& tailColor, const Config& config,
+PlayerSnake::PlayerSnake(const Color& headColor, const Color& tailColor, const GameConfig& config,
                          const Vector2& startPosition,
                          const bool useArrowInput): SnakeBase(headColor, tailColor, config, startPosition),
                                                     useArrowInput(useArrowInput)

@@ -2,27 +2,22 @@
 #include "../include/AutoSnake.h"
 
 // no arg
-GameBase::GameBase() : config(Config()), gameState(GameState::Start),
+GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
                        score(0), food(),
                        startButton({
-                                       static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) -
-                                       100,
-                                       static_cast<float>(15 * config.tileSize) - 25, 200, 50
+                                       static_cast<float>(config.screenWidth) / 2 - 100,
+                                       static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
                                    }, "Start"),
                        pauseButton({
-                                       static_cast<float>(config.gridWidth * config.tileSize) - 120, 10, 100, 30
+                                       static_cast<float>(config.screenWidth) - 120, 10, 100, 30
                                    }, "Pause"),
                        restartButton({
-                                         static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize)
-                                         - 100,
-                                         static_cast<float>(15 * config.tileSize) - 25, 200, 50
+                                         static_cast<float>(config.screenWidth) / 2 - 100,
+                                         static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
                                      }, "ReStart"),
                        menuButton({
-                                      static_cast<float>(config.gridWidth * config.tileSize) / 2 - 100,
-                                      static_cast<float>(config.gridHeight * config.tileSize) / 2 + restartButton.
-                                      bounds.
-                                      height,
-                                      200, 50
+                                      static_cast<float>(config.screenWidth) / 2 - 100,
+                                      restartButton.bounds.y + restartButton.bounds.height, 200, 50
                                   }, "Menu")
 
 {
@@ -30,21 +25,23 @@ GameBase::GameBase() : config(Config()), gameState(GameState::Start),
 }
 
 
-GameBase::GameBase(const Config& config, SnakeBase& snake):
+GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
     config(config), gameState(GameState::Start), score(0),
     snake(&snake),
     startButton({
-                    static_cast<float>(config.gridWidth) / 2 * static_cast<float>(config.tileSize) - 100,
-                    static_cast<float>(15 * config.tileSize) - 25, 200, 50
+                    static_cast<float>(config.screenWidth) / 2 - 100,
+                    static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
                 }, "Start"),
-    pauseButton({static_cast<float>(config.gridWidth * config.tileSize) - 120, 10, 100, 30},GREEN, BLACK, "Pause"),
+    pauseButton({
+                    static_cast<float>(config.screenWidth) - 120, 10, 100, 30
+                }, "Pause"),
     restartButton({
-                      static_cast<float>(config.gridWidth) / 2 - 100, static_cast<float>(config.gridHeight) / 2 - 25,
-                      200, 50
-                  }, "Restart"),
+                      static_cast<float>(config.screenWidth) / 2 - 100,
+                      static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
+                  }, "ReStart"),
     menuButton({
-                   static_cast<float>(config.gridWidth) / 2 - 100,
-                   static_cast<float>(config.gridHeight) / 2 - 25 + restartButton.bounds.y, 200, 50
+                   static_cast<float>(config.screenWidth) / 2 - 100,
+                   restartButton.bounds.y + restartButton.bounds.height, 200, 50
                }, "Menu")
 
 {
@@ -77,10 +74,6 @@ void GameBase::update()
 
 void GameBase::draw()
 {
-    // BeginDrawing();
-    //
-    // ClearBackground(RAYWHITE);
-
     switch (gameState)
     {
     case GameState::Start:
@@ -99,6 +92,15 @@ void GameBase::draw()
         }
     case GameState::Playing:
         {
+            // draw cell
+            for (int i = 0; i <= config.gridHeight; ++i)
+            {
+                DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
+            }
+            for (int i = 0; i <= config.gridWidth; ++i)
+            {
+                DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
+            }
             // draw food
             DrawRectangle(food.x * config.tileSize, food.y * config.tileSize, config.tileSize, config.tileSize, GREEN);
             // draw snake
@@ -120,7 +122,7 @@ void GameBase::draw()
         {
             // draw score
             char scoreText[20];
-            sprintf_s(scoreText, "Score: %d", score);
+            sprintf_s(scoreText, "You Score: %d", score);
             DrawText(scoreText, 10, 10, 20, BLACK);
             DrawText("Pause !",
                      config.gridWidth * config.tileSize / 2 - MeasureText("Pause !", 30) / 2,
@@ -158,13 +160,12 @@ void GameBase::draw()
             break;
         }
     }
-    // EndDrawing();
 }
 
 void GameBase::spawnFood()
 {
-    food.x = GetRandomValue(0, config.gridWidth - 1);
-    food.y = GetRandomValue(0, config.gridHeight - 1);
+    food.x = GetRandomValue(0, config.gridWidth - 10);
+    food.y = GetRandomValue(0, config.gridHeight - 10);
 }
 
 void GameBase::restart()
