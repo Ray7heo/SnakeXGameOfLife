@@ -1,9 +1,8 @@
 ﻿#include "../include/GameBase.h"
-#include "../include/AutoSnake.h"
 
 // no arg
 GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
-                       score(0), food(),
+                       score(0),
                        startButton({
                                        static_cast<float>(config.screenWidth) / 2 - 100,
                                        static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
@@ -18,10 +17,24 @@ GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
                        menuButton({
                                       static_cast<float>(config.screenWidth) / 2 - 100,
                                       restartButton.bounds.y + restartButton.bounds.height, 200, 50
-                                  }, "Menu")
+                                  }, "Menu"),
+                       cells(std::vector<Cell>())
 
 {
-    spawnFood();
+    randomCell();
+
+    std::thread t([&]()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        for (auto& cell : cells)
+        {
+            if (cell.type == CellType::Edible)
+            {
+                cell.type = CellType::Rot;
+            }
+        }
+    });
+    t.join();
 }
 
 
@@ -42,11 +55,25 @@ GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
     menuButton({
                    static_cast<float>(config.screenWidth) / 2 - 100,
                    restartButton.bounds.y + restartButton.bounds.height, 200, 50
-               }, "Menu")
+               }, "Menu"),
+    cells(std::vector<Cell>())
 
 {
-    spawnFood();
+    randomCell();
+    std::thread t([&]()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        for (auto& cell : cells)
+        {
+            if (cell.type == CellType::Edible)
+            {
+                cell.type = CellType::Rot;
+            }
+        }
+    });
+    t.detach();
 }
+
 
 
 void GameBase::update()
@@ -54,16 +81,23 @@ void GameBase::update()
     if (gameState == GameState::Playing)
     {
         // Check collision with food
-        if (CheckCollisionRecs(snake->getCollisionRec(), {
-                                   food.x * config.tileSize, food.y * config.tileSize,
-                                   static_cast<float>(config.tileSize),
-                                   static_cast<float>(config.tileSize)
-                               }))
+        const auto it = std::find_if(cells.begin(), cells.end(), FindCellByPosition(Vector2{snake->body.front()}));
+        if (it != cells.end())
         {
-            score++;
-            snake->grow();
-            spawnFood();
+            if (it->type == CellType::Edible)
+            {
+                score += 3;
+                snake->grow();
+                cells.erase(it);
+            }
+            else if (it->type == CellType::Rot)
+            {
+                score += 1;
+                snake->shrink();
+                cells.erase(it);
+            }
         }
+
 
         if (snake->isDead)
         {
@@ -92,7 +126,7 @@ void GameBase::draw()
         }
     case GameState::Playing:
         {
-            // draw cell
+            // draw grid
             for (int i = 0; i <= config.gridHeight; ++i)
             {
                 DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
@@ -101,8 +135,11 @@ void GameBase::draw()
             {
                 DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
             }
-            // draw food
-            DrawRectangle(food.x * config.tileSize, food.y * config.tileSize, config.tileSize, config.tileSize, GREEN);
+            // draw cell
+            for (const auto& cell : cells)
+            {
+                cell.draw();
+            }
             // draw snake
             snake->draw();
             // draw score
@@ -162,14 +199,84 @@ void GameBase::draw()
     }
 }
 
-void GameBase::spawnFood()
+GameBase::FindCellByPosition::FindCellByPosition(Vector2 targetPos): targetPos(targetPos)
 {
-    food.x = GetRandomValue(0, config.gridWidth - 10);
-    food.y = GetRandomValue(0, config.gridHeight - 10);
 }
+
+bool GameBase::FindCellByPosition::operator()(const Cell& cell) const
+{
+    return cell.position.x == targetPos.x && cell.position.y == targetPos.y;
+}
+
+GameBase::FindCellByType::FindCellByType(const CellType& type): type(type)
+{
+}
+
+bool GameBase::FindCellByType::operator()(const Cell& cell) const
+{
+    return type == cell.type;
+}
+
 
 void GameBase::restart()
 {
-    spawnFood();
+    randomCell();
     score = 0;
+}
+
+void GameBase::randomCell()
+{
+    cells.clear();
+    // 计算权重总和
+    const std::vector<WeightedCell> weightedCells = {
+        {CellType::Blank, 40},
+        {CellType::Edible, 20},
+        {CellType::Rot, 20},
+        {CellType::Die, 15},
+        {CellType::Wall, 5},
+    };
+
+    for (int i = 0; i < config.gridHeight * 3; ++i)
+    {
+        int totalWeight = 0;
+        for (const auto& cell : weightedCells)
+        {
+            totalWeight += cell.weight;
+        }
+        // 生成随机数
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dist(1, totalWeight);
+        const int randomNumber = dist(gen);
+
+        int cumulativeWeight = 0;
+        for (const auto& cell : weightedCells)
+        {
+            cumulativeWeight += cell.weight;
+            if (randomNumber <= cumulativeWeight)
+            {
+                cells.emplace_back(cell.type, randomCellPosition(), config);
+            }
+        }
+        cells.emplace_back(CellType::Blank, randomCellPosition(), config);
+    }
+}
+
+Vector2 GameBase::randomCellPosition()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned int> xDist(5, config.gridWidth - 5);
+    std::uniform_int_distribution<unsigned int> yDist(5, config.gridHeight - 5);
+
+    const auto randomPos = Vector2{static_cast<float>(xDist(gen)), static_cast<float>(yDist(gen))};
+
+    for (const auto& cell : cells)
+    {
+        if (cell.position.x == randomPos.x && cell.position.y == randomPos.y)
+        {
+            return randomCellPosition();
+        }
+    }
+    return randomPos;
 }

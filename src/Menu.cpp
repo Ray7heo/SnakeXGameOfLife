@@ -1,6 +1,7 @@
 ﻿#include "../include/Menu.h"
 
 
+
 Menu::Menu(const GameConfig& config):
     config(config),
     lanGameButton({

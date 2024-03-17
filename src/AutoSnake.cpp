@@ -11,7 +11,8 @@ void AutoSnake::move()
 
 void AutoSnake::autoMove(Vector2& foodPosition)
 {
-    const auto path = findPath(body[0], foodPosition);
+    if (body.empty()) return;
+    const auto path = findPath(body.front(), foodPosition);
 
     // Move the snake
     if (!path.empty() && path.size() >= 2)

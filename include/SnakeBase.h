@@ -20,6 +20,7 @@ public:
     virtual void autoMove(Vector2& foodPosition);
     void draw() const;
     void grow();
+    void shrink();
     Rectangle getCollisionRec() const;
 
 protected:

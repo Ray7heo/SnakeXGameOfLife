@@ -12,7 +12,8 @@ public:
 
 protected:
     void restart() override;
+
 private:
     std::unique_ptr<SnakeBase> autoSnake;
-    int autoScore; 
+    int autoScore;
 };

@@ -1,5 +1,6 @@
 ﻿#include "../include/PVPLocalGame.h"
 
+
 PVPLocalGame::PVPLocalGame(): rightScore(0)
 {
     rightSnake = std::make_unique<PlayerSnake>(BLUE,BLACK, config, Vector2{
@@ -26,15 +27,21 @@ void PVPLocalGame::update()
         rightSnake->move();
         snake->move();
 
-        if (CheckCollisionRecs(rightSnake->getCollisionRec(), {
-                                   food.x * config.tileSize, food.y * config.tileSize,
-                                   static_cast<float>(config.tileSize),
-                                   static_cast<float>(config.tileSize)
-                               }))
+        const auto it = std::find_if(cells.begin(), cells.end(), FindCellByPosition(Vector2{rightSnake->body.front()}));
+        if (it != cells.end())
         {
-            rightScore++;
-            rightSnake->grow();
-            spawnFood();
+            if (it->type == CellType::Edible)
+            {
+                rightScore += 3;
+                rightSnake->grow();
+                cells.erase(it);
+            }
+            else if (it->type == CellType::Rot)
+            {
+                rightScore += 1;
+                rightSnake->shrink();
+                cells.erase(it);
+            }
         }
         if (rightSnake->isDead)
         {

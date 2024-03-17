@@ -8,6 +8,7 @@
 #include "../include/PVEGame.h"
 #include "../include/LANGame.h"
 #include "../include/GameBase.h"
+#include "../include/PlayerSnake.h"
 
 class Menu
 {

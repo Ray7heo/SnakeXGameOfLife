@@ -1,7 +1,5 @@
 ﻿#include "../include/PVEGame.h"
 
-#include "../include/AutoSnake.h"
-
 
 PVEGame::PVEGame(): autoScore(0)
 {
@@ -17,31 +15,44 @@ PVEGame::PVEGame(): autoScore(0)
 PVEGame::PVEGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake), autoScore(0)
 {
     autoSnake = std::make_unique<AutoSnake>(BLUE,BLACK, config, Vector2{
-                                              static_cast<float>(config.gridWidth),
-                                              static_cast<float>(config.gridHeight / 2)
-                                          });
+                                                static_cast<float>(config.gridWidth),
+                                                static_cast<float>(config.gridHeight / 2)
+                                            });
 }
 
 void PVEGame::update()
 {
     if (gameState == GameState::Playing)
     {
-        autoSnake->autoMove(food);
+        const auto it = std::find_if(cells.begin(), cells.end(), FindCellByPosition(Vector2{autoSnake->body.front()}));
+        const auto food = std::find_if(cells.begin(), cells.end(), FindCellByType(CellType::Edible));
+        if (food != cells.end())
+        {
+            autoSnake->autoMove(food->position);
+        }
         snake->move();
 
-        if (CheckCollisionRecs(autoSnake->getCollisionRec(), {
-                                   food.x * config.tileSize, food.y * config.tileSize,
-                                   static_cast<float>(config.tileSize),
-                                   static_cast<float>(config.tileSize)
-                               }))
+        if (it != cells.end())
         {
-            autoScore++;
-            autoSnake->grow();
-            spawnFood();
+            if (it->type == CellType::Edible)
+            {
+                autoScore += 3;
+                autoSnake->grow();
+                cells.erase(it);
+            }
+            else if (it->type == CellType::Rot)
+            {
+                autoScore += 1;
+                autoSnake->shrink();
+                cells.erase(it);
+            }
         }
+
+
         if (autoSnake->isDead)
         {
-            gameState = GameState::GameOver;
+            // gameState = GameState::GameOver;
+            // autoSnake->body.clear();
         }
     }
     GameBase::update();
@@ -74,7 +85,11 @@ void PVEGame::restart()
                                                 static_cast<float>(config.gridWidth),
                                                 static_cast<float>(config.gridHeight / 2)
                                             });
-    autoSnake->autoMove(food);
+    const auto food = std::find_if(cells.begin(), cells.end(), FindCellByType(CellType::Edible));
+    if (food != cells.end())
+    {
+        autoSnake->autoMove(food->position);
+    }
     snake = std::make_unique<
         PlayerSnake>(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
 }
