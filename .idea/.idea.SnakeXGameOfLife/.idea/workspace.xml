@@ -9,10 +9,9 @@
   <component name="ChangeListManager">
     <list default="true" id="5f9497d2-aa73-4434-a9ed-666363ca6796" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SnakeXGameOfLife/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SnakeXGameOfLife/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GameBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/PVEGame.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/PVEGame.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PVEGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/PVEGame.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SingleGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SingleGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/PVPLocalGame.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/PVPLocalGame.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PVPLocalGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/PVPLocalGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SnakeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SnakeBase.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +116,7 @@
       <option name="presentableId" value="Default" />
       <updated>1710729180735</updated>
       <workItem from="1710729184890" duration="722000" />
-      <workItem from="1710729940932" duration="2217000" />
+      <workItem from="1710729940932" duration="3898000" />
     </task>
     <servers />
   </component>

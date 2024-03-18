@@ -17,9 +17,8 @@ void SnakeBase::move()
     body.pop_back();
 
     // Check collision with walls
-    if (body.front().x > static_cast<float>(config.gridWidth) || body.front().x < 0 || body.front().y > static_cast<
-            float>(config.gridHeight) || body.front().
-                                              y < 0)
+    if (body.front().x >= static_cast<float>(config.gridWidth) || body.front().x < 0 || body.front().y >= static_cast<
+        float>(config.gridHeight) || body.front().y < 0)
     {
         isDead = true;
     }

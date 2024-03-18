@@ -55,6 +55,11 @@ void GameBase::update()
 {
     if (gameState == GameState::Playing)
     {
+        if (snake->isDead)
+        {
+            gameState = GameState::GameOver;
+            return;
+        }
         if (snake->body.front().x >= 0)
         {
             // Check collision with food
@@ -77,10 +82,7 @@ void GameBase::update()
             }
         }
 
-        if (snake->isDead)
-        {
-            gameState = GameState::GameOver;
-        }
+
     }
 }
 

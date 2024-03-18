@@ -13,7 +13,8 @@ public:
 
 protected:
     void restart() override;
+    int countLiveNeighbors(int x, int y) const override;
 private:
     std::unique_ptr<SnakeBase> rightSnake;
-    int rightScore; 
+    int rightScore;
 };
