@@ -23,9 +23,8 @@ GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
                                                                                  config.gridHeight)))
 
 {
-    // randomCell();
+    randomCell();
 }
-
 
 GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
     config(config), gameState(GameState::Start), score(0),
@@ -52,7 +51,6 @@ GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
     randomCell();
 }
 
-
 void GameBase::update()
 {
     if (gameState == GameState::Playing)
@@ -72,6 +70,10 @@ void GameBase::update()
                 score += 1;
                 snake->shrink();
                 cell->type = CellType::Blank;
+            }
+            else if (cell->type == CellType::Wall)
+            {
+                snake->isDead = true;
             }
         }
 
@@ -184,13 +186,45 @@ void GameBase::restart()
     score = 0;
 }
 
+[[noreturn]] void GameBase::updateCell() const
+{
+    while (true)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        for (int y = 0; y < config.gridHeight; y++)
+        {
+            for (int x = 0; x < config.gridWidth; x++)
+            {
+                const auto cell = cells[y][x];
+                const auto count = countLiveNeighbors(x, y);
+                if (cell->type == CellType::Edible || cell->type == CellType::Rot)
+                {
+                    if (count < 2 || count > 3)
+                    {
+                        cell->type = CellType::Die;
+                        cell->reductionCounter();
+                    }
+                }
+                else if(cell->type == CellType::Die)
+                {
+                    if (count == 3)
+                    {
+                        cell->resurgence();
+                    }
+                }
+            }
+        }
+    }
+}
+
 void GameBase::randomCell()
 {
+    updateThread = std::thread(&GameBase::updateCell, this);
     cells.clear();
     // 计算权重总和
     const std::vector<WeightedCell> weightedCells = {
-        {CellType::Blank, 800},
-        {CellType::Edible, 20},
+        {CellType::Blank, 400},
+        {CellType::Edible, 50},
         {CellType::Rot, 20},
         {CellType::Die, 15},
         {CellType::Wall, 5},
@@ -206,4 +240,27 @@ void GameBase::randomCell()
                                                       config));
         }
     }
+    updateThread.detach();
+}
+
+int GameBase::countLiveNeighbors(const int x, const int y) const
+{
+    int count = 0;
+    for (int i = x - 1; i <= x + 1; ++i)
+    {
+        for (int j = y - 1; j <= y + 1; ++j)
+        {
+            if (i >= 0 && i < config.gridHeight && j >= 0 && j < config.gridWidth && !(i == x && j == y))
+            {
+                const auto head = snake->body.front();
+                const auto tail = snake->body.back();
+                if (cells[j][i]->type == CellType::Edible || cells[j][i]->type == CellType::Rot || (head.x == i && head.
+                    y == j) || (tail.x == i && tail.y == j))
+                {
+                    count++;
+                }
+            }
+        }
+    }
+    return count;
 }

@@ -39,6 +39,10 @@ public:
     void draw() const;
 
     static CellType randomType(const std::vector<WeightedCell>& weightedCells);
+    void reductionCounter();
+    void resurgence();
 private:
     GameConfig config;
+    int counter = 10;
+
 };

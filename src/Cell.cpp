@@ -70,3 +70,21 @@ CellType Cell::randomType(const std::vector<WeightedCell>& weightedCells)
     }
     return CellType::Blank;
 }
+
+void Cell::reductionCounter()
+{
+    if (counter <= 0) return;
+    counter--;
+}
+
+void Cell::resurgence()
+{
+    if (counter > 0)
+    {
+        type = CellType::Edible;
+    }
+    else
+    {
+        type = CellType::Rot;
+    }
+}

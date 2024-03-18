@@ -47,7 +47,9 @@ protected:
 
     virtual void restart();
 
+    void updateCell() const;
 private:
+    std::thread updateThread;
     void randomCell();
-    // static CellType randomType(const std::vector<WeightedCell>& weightedCells);
+    int countLiveNeighbors(int x, int y) const;
 };
