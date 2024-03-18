@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <thread>
-#include <raylib.h>
 
 #include "../include/GameConfig.h"
 #include "../include/SingleGame.h"
@@ -9,6 +8,8 @@
 #include "../include/LANGame.h"
 #include "../include/GameBase.h"
 #include "../include/PlayerSnake.h"
+
+
 
 class Menu
 {

@@ -1,7 +1,5 @@
 ﻿#include "../include/Menu.h"
 
-
-
 Menu::Menu(const GameConfig& config):
     config(config),
     lanGameButton({
@@ -91,7 +89,8 @@ void Menu::selectGameMode()
         }
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && lanGameButton.isClicked(GetMousePosition()))
         {
-            game = std::make_unique<LANGame>();
+            const auto snake = new PlayerSnake(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight) / 2});
+            game = std::make_unique<LANGame>(config, *snake);
         }
     }
 }

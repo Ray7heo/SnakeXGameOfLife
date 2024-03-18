@@ -18,4 +18,6 @@ GameConfig::GameConfig()
     gridWidth = 50;
     gridHeight = 30;
     tileSize = 30;
+    screenHeight = 720;
+    screenWidth = 1280;
 }
