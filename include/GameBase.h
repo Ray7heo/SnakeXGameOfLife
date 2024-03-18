@@ -47,9 +47,9 @@ protected:
 
     virtual void restart();
 
-    void updateCell() const;
+    virtual int countLiveNeighbors(int x, int y) const;
 private:
     std::thread updateThread;
     void randomCell();
-    int countLiveNeighbors(int x, int y) const;
+    void updateCell() const;
 };
