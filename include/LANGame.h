@@ -2,6 +2,10 @@
 #include "GameBase.h"
 #include "TextInput.h"
 
+#include <raylib.h>
+#define ShowCursor RayShowCursor
+#define CloseWindow RayCloseWindow
+#include <asio.hpp>
 
 class LANGame final : public GameBase
 {
@@ -15,5 +19,10 @@ public:
 protected:
     void restart() override;
     TextInput textInput;
-
+private:
+    asio::io_context context;
+    asio::ip::udp::socket socket;
+    std::string ip;
+    Button guestButton;
+    Button hostButton;
 };

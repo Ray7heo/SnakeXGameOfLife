@@ -1,5 +1,6 @@
 ﻿#include "../include/Menu.h"
 
+
 Menu::Menu(const GameConfig& config):
     config(config),
     lanGameButton({
@@ -37,7 +38,7 @@ void Menu::update()
         EndDrawing();
     }
 
-    CloseWindow();
+    // RayCloseWindow();
 }
 
 void Menu::drawGame() const
@@ -60,9 +61,9 @@ void Menu::selectGameMode()
         pvpLocalGameButton.draw();
         pveGameButton.draw();
         lanGameButton.draw();
-        DrawText("Snake X Game of Life",
-                 config.screenWidth / 2 - MeasureText("Snake X Game of Life", 50) / 2,
-                 config.screenHeight / 2, 50, RED);
+        // DrawText("Snake X Game of Life",
+                 // config.screenWidth / 2 - MeasureText("Snake X Game of Life", 50) / 2,
+                 // config.screenHeight / 2, 50, RED);
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && singleGameButton.isClicked(GetMousePosition()))
         {
             const auto snake = new PlayerSnake(RED,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight) / 2});

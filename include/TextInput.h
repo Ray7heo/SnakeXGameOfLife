@@ -7,14 +7,15 @@ class TextInput
 {
 public:
     TextInput() = default;
-    explicit TextInput(Rectangle rect, std::string defaultText = "");
+    explicit TextInput(Rectangle bounds, std::string defaultText = "");
 
     void update();
 
     void draw() const;
 
     std::string text;
+    Rectangle bounds;
+
 private:
-    Rectangle rect;
     bool active = false;
 };
