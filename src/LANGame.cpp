@@ -4,7 +4,8 @@
 #include "../include/UdpServer.h"
 
 
-LANGame::LANGame(): textInput(), socket(context), guestButton({0, textInput.bounds.height, 200, 50}, "Guest"),
+LANGame::LANGame(): textInput(), server(context, ""), client(context, "", ""),
+                    guestButton({0, textInput.bounds.height, 200, 50}, "Guest"),
                     hostButton({0, guestButton.bounds.y + 50, 200, 50}, "Host")
 {
 }
@@ -12,11 +13,12 @@ LANGame::LANGame(): textInput(), socket(context), guestButton({0, textInput.boun
 LANGame::~LANGame()
 {
     context.stop();
+    isContextRun = false;
 }
 
 LANGame::LANGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake),
-                                                              textInput({0, 0, 200, 30}, ""),
-                                                              socket(context),
+                                                              textInput({0, 0, 200, 30}, ""), server(context, ""),
+                                                              client(context, "", ""),
                                                               guestButton(
                                                                   {0, textInput.bounds.height, 200, 50}, "Guest"),
                                                               hostButton({0, guestButton.bounds.y + 50, 200, 50},
@@ -29,6 +31,10 @@ void LANGame::update()
     if (gameState == GameState::Playing)
     {
         snake->move();
+        remoteSnake->move();
+        if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT))
+        {
+        }
     }
     GameBase::update();
 }
@@ -44,15 +50,15 @@ void LANGame::draw()
 {
     if (gameState == GameState::Start)
     {
-        if (canDrawClientSnake)
+        if (canDrawRemoteSnake)
         {
             remoteSnake->draw();
         }
-        if (canDrawServerSnake)
+        if (canDrawLocalSnake)
         {
             snake->draw();
         }
-        if (!canDrawServerSnake && !canDrawClientSnake)
+        if (!canDrawLocalSnake && !canDrawRemoteSnake)
         {
             hostButton.draw();
             guestButton.draw();
@@ -62,21 +68,35 @@ void LANGame::draw()
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && hostButton.isClicked(GetMousePosition()))
         {
-            snake->draw();
             if (!isContextRun)
             {
+                isHost = true;
                 isContextRun = true;
-                canDrawServerSnake = true;
-                std::thread([this]()
+                canDrawLocalSnake = true;
+                std::thread([this]
                 {
-                    UdpServer server(context, "12345");
-                    server.receive([this](const std::string& message)
+                    server = UdpServer(context, "12345");
+                    server.receive([&](const std::string& message)
                     {
                         rapidjson::Document document;
+                        // first time
+                        if (remoteSnake == nullptr)
+                        {
+                            // send
+                            document = rapidjson::Document(rapidjson::kObjectType);
+                            rapidjson::Value value = snake->toJson(document.GetAllocator());
+                            document.AddMember("snake", value, document.GetAllocator());
+                            rapidjson::StringBuffer buffer;
+                            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                            document.Accept(writer);
+                            const char* string = buffer.GetString();
+                            server.send(*new std::string(string));
+                        }
+                        // parse remote snake
                         document.Parse(message.c_str());
-                        SnakeBase receiveSnake = SnakeBase::fromJson(document["snake"]);
                         remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
-                        canDrawClientSnake = true;
+                        remoteSnake->config = config;
+                        canDrawRemoteSnake = true;
                     });
                     context.run();
                 }).detach();
@@ -86,10 +106,12 @@ void LANGame::draw()
         {
             if (!isContextRun)
             {
+                isHost = false;
+                canDrawLocalSnake = true;
                 isContextRun = true;
-                std::thread([this]()
+                std::thread([this]
                 {
-                    UdpClient client(context, "127.0.0.1", "12345");
+                    client = UdpClient(context, "127.0.0.1", "12345");
 
                     rapidjson::Document document(rapidjson::kObjectType);
                     snake = std::make_unique<PlayerSnake>(snake->headColor, snake->tailColor, config, Vector2{
@@ -98,16 +120,19 @@ void LANGame::draw()
                                                           });
                     rapidjson::Value value = snake->toJson(document.GetAllocator());
                     document.AddMember("snake", value, document.GetAllocator());
-
                     rapidjson::StringBuffer buffer;
                     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     document.Accept(writer);
 
                     const char* string = buffer.GetString();
                     client.send(*new std::string(string));
-                    client.receive([&](const std::string& message)
+                    client.receive([this, &document](const std::string& message)
                     {
-                        std::cout << message << "\n";
+                        document = rapidjson::Document();
+                        document.Parse(message.c_str());
+                        remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
+                        remoteSnake->config = config;
+                        canDrawRemoteSnake = true;
                     });
                     context.run();
                 }).detach();

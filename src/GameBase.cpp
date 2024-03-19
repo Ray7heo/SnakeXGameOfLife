@@ -81,8 +81,6 @@ void GameBase::update()
                 snake->isDead = true;
             }
         }
-
-
     }
 }
 
@@ -192,6 +190,7 @@ void GameBase::restart()
 {
     while (true)
     {
+        if (gameState != GameState::Playing) continue;
         std::this_thread::sleep_for(std::chrono::seconds(5));
         for (int y = 0; y < config.gridHeight; y++)
         {
@@ -207,7 +206,7 @@ void GameBase::restart()
                         cell->reductionCounter();
                     }
                 }
-                else if(cell->type == CellType::Die)
+                else if (cell->type == CellType::Die)
                 {
                     if (count == 3)
                     {

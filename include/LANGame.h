@@ -10,6 +10,9 @@
 #define CloseWindow RayCloseWindow
 #include <asio.hpp>
 
+#include "UdpClient.h"
+#include "UdpServer.h"
+
 class LANGame final : public GameBase
 {
 public:
@@ -23,12 +26,14 @@ protected:
     void restart() override;
     TextInput textInput;
 private:
-    bool canDrawServerSnake = false;
-    bool canDrawClientSnake = false;
-    std::unique_ptr<SnakeBase> remoteSnake;
     asio::io_context context;
+    UdpServer server;
+    UdpClient client;
+    bool isHost = false;
+    bool canDrawLocalSnake = false;
+    bool canDrawRemoteSnake = false;
+    std::unique_ptr<SnakeBase> remoteSnake = nullptr;
     bool isContextRun = false;
-    asio::ip::udp::socket socket;
     std::string ip;
     Button guestButton;
     Button hostButton;

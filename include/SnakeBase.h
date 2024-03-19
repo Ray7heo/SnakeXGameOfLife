@@ -35,7 +35,6 @@ public:
 
     static SnakeBase fromJson(const rapidjson::Value& json);
 
-protected:
     GameConfig config;
 
 private:
