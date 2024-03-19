@@ -37,7 +37,6 @@ public:
     virtual void draw();
 
 protected:
-
     std::unique_ptr<SnakeBase> snake;
     Button startButton;
     Button pauseButton;
@@ -48,6 +47,7 @@ protected:
     virtual void restart();
 
     virtual int countLiveNeighbors(int x, int y) const;
+
 private:
     std::thread updateThread;
     void randomCell();
