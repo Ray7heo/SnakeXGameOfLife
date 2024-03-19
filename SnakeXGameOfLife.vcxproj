@@ -1061,6 +1061,8 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="src\UdpClient.cpp" />
+    <ClCompile Include="src\UdpServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Cell.h" />
@@ -1076,6 +1078,8 @@
     <ClInclude Include="include\SingleGame.h" />
     <ClInclude Include="include\SnakeBase.h" />
     <ClInclude Include="include\TextInput.h" />
+    <ClInclude Include="include\UdpClient.h" />
+    <ClInclude Include="include\UdpServer.h" />
     <ClInclude Include="lib\RayLib\raylib.h" />
   </ItemGroup>
   <ItemGroup>

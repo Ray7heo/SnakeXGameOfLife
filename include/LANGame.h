@@ -21,6 +21,7 @@ protected:
     TextInput textInput;
 private:
     asio::io_context context;
+    bool isContextRun = false;
     asio::ip::udp::socket socket;
     std::string ip;
     Button guestButton;
