@@ -37,6 +37,7 @@ public:
     virtual void draw();
 
 protected:
+    bool isMapReady = false;
     std::unique_ptr<SnakeBase> snake;
     Button startButton;
     Button pauseButton;

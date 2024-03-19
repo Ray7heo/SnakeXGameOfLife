@@ -8,7 +8,6 @@
 
 #include "../lib/rapidjson/document.h"
 #include "../lib/rapidjson/writer.h"
-#include "../lib/rapidjson/stringbuffer.h"
 
 class SnakeBase
 {
@@ -29,7 +28,6 @@ public:
     void grow();
     void shrink();
     Rectangle getCollisionRec() const;
-
 
     rapidjson::Value toJson(rapidjson::Document::AllocatorType& allocator) const;
 

@@ -1,7 +1,7 @@
 #include "../include/UdpClient.h"
 
 UdpClient::UdpClient(asio::io_context& ioContext, const std::string& serverIp, const std::string& serverPort):
-    socket(ioContext), serverEndpoint(asio::ip::address::from_string(serverIp), std::stoi(serverPort)),receiveBuffer()
+    socket(ioContext), serverEndpoint(asio::ip::address::from_string(serverIp), std::stoi(serverPort)), receiveBuffer()
 {
     socket.open(asio::ip::udp::v4());
 }
@@ -13,8 +13,8 @@ void UdpClient::receive(std::function<void(const std::string&)> messageHandler)
                               {
                                   if (!ec && bytesReceived > 0)
                                   {
-                                      std::string receivedMessage(receiveBuffer.begin(),
-                                                                  receiveBuffer.begin() + bytesReceived);
+                                      const std::string receivedMessage(receiveBuffer.begin(),
+                                                                        receiveBuffer.begin() + bytesReceived);
                                       if (messageHandler)
                                       {
                                           messageHandler(receivedMessage);
@@ -28,10 +28,11 @@ void UdpClient::receive(std::function<void(const std::string&)> messageHandler)
                                   }
                               });
 }
-void UdpClient::send(std::string& message)
+
+void UdpClient::send(std::string& data)
 {
-    socket.async_send_to(asio::buffer(message), serverEndpoint,
-                         [this](const std::error_code ec, std::size_t)
+    socket.async_send_to(asio::buffer(data), serverEndpoint,
+                         [](const std::error_code ec, std::size_t)
                          {
                              if (ec)
                              {

@@ -5,6 +5,9 @@
 #include "GameConfig.h"
 #include "../lib/RayLib/raylib.h"
 
+#include "../lib/rapidjson/document.h"
+#include "../lib/rapidjson/writer.h"
+
 enum class CellType
 {
     Blank,
@@ -41,6 +44,14 @@ public:
     static CellType randomType(const std::vector<WeightedCell>& weightedCells);
     void reductionCounter();
     void resurgence();
+
+    rapidjson::Value toJson(rapidjson::Document::AllocatorType& allocator) const;
+    static Cell fromJson(const rapidjson::Value& jsonValue);
+
+    static rapidjson::Value toJsons(const std::vector<std::vector<std::shared_ptr<Cell>>>& grid, rapidjson::Document::AllocatorType& allocator);
+
+    static std::vector<std::vector<std::shared_ptr<Cell>>> fromJsons(const rapidjson::Value& jsonValue);
+
 private:
     GameConfig config;
     int counter = 10;

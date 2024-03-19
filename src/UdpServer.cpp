@@ -1,14 +1,14 @@
 #include "../include/UdpServer.h"
 
 UdpServer::UdpServer(asio::io_context& ioContext, const std::string& listenPort):
-    socket(ioContext, asio::ip::udp::endpoint(asio::ip::udp::v4(), std::stoi(listenPort))), receiveBuffer(std::array<char, 1024>())
+    socket(ioContext, asio::ip::udp::endpoint(asio::ip::udp::v4(), std::stoi(listenPort))), receiveBuffer()
 {
 }
 
-void UdpServer::send(std::string& message)
+void UdpServer::send(std::string& data)
 {
-    socket.async_send_to(asio::buffer(message), remoteEndpoint,
-                         [this](const std::error_code ec, std::size_t)
+    socket.async_send_to(asio::buffer(data), remoteEndpoint,
+                         [](const std::error_code ec, std::size_t)
                          {
                              if (ec)
                              {
@@ -16,6 +16,7 @@ void UdpServer::send(std::string& message)
                              }
                          });
 }
+
 
 void UdpServer::receive(const std::function<void(const std::string&)>& messageHandler)
 {

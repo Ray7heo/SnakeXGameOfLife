@@ -241,6 +241,7 @@ void GameBase::randomCell()
                                                       config));
         }
     }
+    isMapReady = true;
     updateThread.detach();
 }
 
