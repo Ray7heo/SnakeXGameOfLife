@@ -9,7 +9,7 @@ class UdpServer
 public:
     UdpServer(asio::io_context& ioContext, const std::string& listenPort);
     void receive(const std::function<void(const std::string&)>& messageHandler);
-    void send(std::string& data);
+    void send(std::string& data, const std::function<void(std::error_code ec, std::size_t)>& errorHandler);
 
 private:
     asio::ip::udp::socket socket;

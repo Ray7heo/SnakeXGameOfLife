@@ -29,14 +29,7 @@ void UdpClient::receive(std::function<void(const std::string&)> messageHandler)
                               });
 }
 
-void UdpClient::send(std::string& data)
+void UdpClient::send(std::string& data, const std::function<void(std::error_code ec, std::size_t)>& errorHandler)
 {
-    socket.async_send_to(asio::buffer(data), serverEndpoint,
-                         [](const std::error_code ec, std::size_t)
-                         {
-                             if (ec)
-                             {
-                                 std::cerr << "Error sending response: " << ec.message() << "\n";
-                             }
-                         });
+    socket.async_send_to(asio::buffer(data), serverEndpoint, errorHandler);
 }

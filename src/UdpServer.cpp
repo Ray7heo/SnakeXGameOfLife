@@ -5,18 +5,10 @@ UdpServer::UdpServer(asio::io_context& ioContext, const std::string& listenPort)
 {
 }
 
-void UdpServer::send(std::string& data)
+void UdpServer::send(std::string& data, const std::function<void(std::error_code ec, std::size_t)>& errorHandler)
 {
-    socket.async_send_to(asio::buffer(data), remoteEndpoint,
-                         [](const std::error_code ec, std::size_t)
-                         {
-                             if (ec)
-                             {
-                                 std::cerr << "Error sending response: " << ec.message() << "\n";
-                             }
-                         });
+    socket.async_send_to(asio::buffer(data), remoteEndpoint,errorHandler);
 }
-
 
 void UdpServer::receive(const std::function<void(const std::string&)>& messageHandler)
 {

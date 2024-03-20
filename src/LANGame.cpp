@@ -68,7 +68,11 @@ void LANGame::restart()
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     document.Accept(writer);
-    server.send(*new std::string(buffer.GetString()));
+    auto data = new std::string(buffer.GetString());
+    server.send(*data, [data](const std::error_code ec, size_t t)
+    {
+        delete data;
+    });
 
     while (!isMapReady)
     {
@@ -88,7 +92,11 @@ void LANGame::restart()
             rapidjson::StringBuffer buffer;
             rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
             document.Accept(writer);
-            server.send(*new std::string(buffer.GetString()));
+            auto data = new std::string(buffer.GetString());
+            server.send(*data, [data](const std::error_code ec, size_t t)
+            {
+                delete data;
+            });
         }
     }
 }
@@ -133,13 +141,21 @@ void LANGame::syncState()
             rapidjson::StringBuffer buffer;
             rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
             document.Accept(writer);
+
+            auto data = new std::string(buffer.GetString());
             if (isHost)
             {
-                server.send(*new std::string(buffer.GetString()));
+                server.send(*data, [data](const std::error_code ec, size_t t)
+                {
+                    delete data;
+                });
             }
             else
             {
-                client.send(*new std::string(buffer.GetString()));
+                client.send(*data, [data](const std::error_code ec, size_t t)
+                {
+                    delete data;
+                });
             }
         }
     }).detach();
@@ -187,7 +203,11 @@ void LANGame::draw()
                     rapidjson::StringBuffer buffer;
                     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     document.Accept(writer);
-                    server.send(*new std::string(buffer.GetString()));
+                    auto data = new std::string(buffer.GetString());
+                    server.send(*data, [data](const std::error_code ec, size_t t)
+                    {
+                        delete data;
+                    });
                 }
                 else
                 {
@@ -228,7 +248,11 @@ void LANGame::draw()
                                 rapidjson::StringBuffer buffer;
                                 rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                                 document.Accept(writer);
-                                server.send(*new std::string(buffer.GetString()));
+                                auto data = new std::string(buffer.GetString());
+                                server.send(*data, [data](const std::error_code ec, size_t t)
+                                {
+                                    delete data;
+                                });
 
                                 while (!isMapReady)
                                 {
@@ -248,7 +272,11 @@ void LANGame::draw()
                                         rapidjson::StringBuffer buffer;
                                         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                                         document.Accept(writer);
-                                        server.send(*new std::string(buffer.GetString()));
+                                        auto data = new std::string(buffer.GetString());
+                                        server.send(*data, [data](const std::error_code ec, size_t t)
+                                        {
+                                            delete data;
+                                        });
                                     }
                                 }
                             }
@@ -303,8 +331,11 @@ void LANGame::draw()
                     rapidjson::StringBuffer buffer;
                     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     document.Accept(writer);
-
-                    client.send(*new std::string(buffer.GetString()));
+                    auto data = new std::string(buffer.GetString());
+                    client.send(*data, [data](const std::error_code ec, size_t t)
+                    {
+                        delete data;
+                    });
 
                     client.receive([&](const std::string& data)
                     {
@@ -379,13 +410,20 @@ void LANGame::draw()
             rapidjson::StringBuffer buffer;
             rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
             document.Accept(writer);
+            auto data = new std::string(buffer.GetString());
             if (isHost)
             {
-                server.send(*new std::string(buffer.GetString()));
+                server.send(*data, [data](const std::error_code ec, size_t t)
+                {
+                    delete data;
+                });
             }
             else
             {
-                client.send(*new std::string(buffer.GetString()));
+                client.send(*data, [data](const std::error_code ec, size_t t)
+                {
+                    delete data;
+                });
             }
             context.stop();
             isContextRun = false;
