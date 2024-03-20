@@ -24,11 +24,15 @@ public:
     void update() override;
     void draw() override;
 
+    
 protected:
     void restart() override;
     TextInput textInput;
+    int countLiveNeighbors(int x, int y) const override;
 
 private:
+    bool canSyncState = true;
+    void syncState();
     asio::io_context context;
     UdpServer server;
     UdpClient client;

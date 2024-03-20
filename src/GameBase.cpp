@@ -123,7 +123,10 @@ void GameBase::draw()
                 }
             }
             // draw snake
-            snake->draw();
+            if (!snake->isDead)
+            {
+                snake->draw();
+            }
             // draw score
             char scoreText[20];
             sprintf_s(scoreText, "You Score: %d", score);
@@ -133,16 +136,40 @@ void GameBase::draw()
             pauseButton.draw();
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pauseButton.isClicked(GetMousePosition()))
             {
+                snake->direction = {0, 0};
                 gameState = GameState::Paused;
             }
             break;
         }
     case GameState::Paused:
         {
+            // draw grid
+            for (int i = 0; i <= config.gridHeight; ++i)
+            {
+                DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
+            }
+            for (int i = 0; i <= config.gridWidth; ++i)
+            {
+                DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
+            }
+            // draw cell
+            for (const auto& yCell : cells)
+            {
+                for (const auto& xCell : yCell)
+                {
+                    xCell->draw();
+                }
+            }
+            // draw snake
+            if (!snake->isDead)
+            {
+                snake->draw();
+            }
             // draw score
             char scoreText[20];
             sprintf_s(scoreText, "You Score: %d", score);
             DrawText(scoreText, 10, 10, 20, BLACK);
+
             DrawText("Pause !",
                      config.gridWidth * config.tileSize / 2 - MeasureText("Pause !", 30) / 2,
                      config.gridHeight * config.tileSize / 2 - 20, 30, RED);
@@ -161,6 +188,28 @@ void GameBase::draw()
         }
     case GameState::GameOver:
         {
+            // draw grid
+            for (int i = 0; i <= config.gridHeight; ++i)
+            {
+                DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
+            }
+            for (int i = 0; i <= config.gridWidth; ++i)
+            {
+                DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
+            }
+            // draw cell
+            for (const auto& yCell : cells)
+            {
+                for (const auto& xCell : yCell)
+                {
+                    xCell->draw();
+                }
+            }
+            // draw score
+            char scoreText[20];
+            sprintf_s(scoreText, "You Score: %d", score);
+            DrawText(scoreText, 10, 10, 20, BLACK);
+
             restartButton.draw();
             menuButton.draw();
             DrawText("GameOver !",
@@ -191,11 +240,11 @@ void GameBase::restart()
 {
     while (true)
     {
-        if (gameState != GameState::Playing || !canUpdateCell)
+        if (gameState != GameState::Playing)
         {
             continue;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         for (int y = 0; y < config.gridHeight; y++)
         {
             for (int x = 0; x < config.gridWidth; x++)
