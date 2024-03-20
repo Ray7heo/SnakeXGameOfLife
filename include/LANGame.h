@@ -4,6 +4,7 @@
 #include "../lib/rapidjson/document.h"
 #include "../lib/rapidjson/writer.h"
 #include "../lib/rapidjson/stringbuffer.h"
+#include <memory>
 
 #include <raylib.h>
 #define ShowCursor RayShowCursor
@@ -19,12 +20,14 @@ public:
     LANGame();
     ~LANGame() override;
     LANGame(const GameConfig& config, SnakeBase& snake);
+
     void update() override;
     void draw() override;
 
 protected:
     void restart() override;
     TextInput textInput;
+
 private:
     asio::io_context context;
     UdpServer server;
@@ -33,6 +36,7 @@ private:
     bool canDrawLocalSnake = false;
     bool canDrawRemoteSnake = false;
     std::unique_ptr<SnakeBase> remoteSnake = nullptr;
+    int remoteScore = 0;
     bool isContextRun = false;
     std::string ip;
     Button guestButton;

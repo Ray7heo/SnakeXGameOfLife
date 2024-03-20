@@ -1,8 +1,8 @@
 ﻿#include "../include/LANGame.h"
 
-#include "../include/UdpClient.h"
-#include "../include/UdpServer.h"
-
+#define DrawText RayDrawText
+#define RayDrawText DrawText
+#define RayCloseWindow CloseWindow
 
 LANGame::LANGame(): textInput(), server(context, ""), client(context, "", ""),
                     guestButton({0, textInput.bounds.height, 200, 50}, "Guest"),
@@ -24,6 +24,7 @@ LANGame::LANGame(const GameConfig& config, SnakeBase& snake): GameBase(config, s
                                                               hostButton({0, guestButton.bounds.y + 50, 200, 50},
                                                                          "Host")
 {
+    canUpdateCell = false;
 }
 
 void LANGame::update()
@@ -37,6 +38,8 @@ void LANGame::update()
             rapidjson::Document document(rapidjson::kObjectType);
             rapidjson::Value value = snake->toJson(document.GetAllocator());
             document.AddMember("snake", value, document.GetAllocator());
+            document.AddMember("dataType", rapidjson::StringRef("snake"), document.GetAllocator());
+            document.AddMember("score", score, document.GetAllocator());
             rapidjson::StringBuffer buffer;
             rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
             document.Accept(writer);
@@ -85,31 +88,16 @@ void LANGame::draw()
         {
             std::thread([this]()
             {
-                asio::io_context tempContext;
-                rapidjson::Document document;
                 if (isHost)
                 {
-                    auto tempServer = UdpServer(tempContext, "12344");
-                    while (!isMapReady)
-                    {
-                    }
-                    document = rapidjson::Document(rapidjson::kObjectType);
-                    rapidjson::Value gridValue = Cell::toJsons(cells, document.GetAllocator());
-                    document.AddMember("cells", gridValue, document.GetAllocator());
+                    auto document = rapidjson::Document(rapidjson::kObjectType);
+                    document.AddMember("dataType", rapidjson::StringRef("state"), document.GetAllocator());
+                    document.AddMember("state", rapidjson::StringRef("playing"), document.GetAllocator());
                     rapidjson::StringBuffer buffer;
                     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     document.Accept(writer);
-                    tempServer.send(*new std::string(buffer.GetString()));
+                    server.send(*new std::string(buffer.GetString()));
                 }
-                else
-                {
-                    UdpClient(tempContext, "127.0.0.1", "12344").receive([&](const std::string& data)
-                    {
-                        document.Parse(data.c_str());
-                        std::cout << data << "\n";
-                    });
-                }
-                tempContext.run_one();
             }).detach();
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && hostButton.isClicked(GetMousePosition()))
@@ -125,23 +113,52 @@ void LANGame::draw()
                     server.receive([&](const std::string& data)
                     {
                         rapidjson::Document document;
-                        // first time
-                        if (remoteSnake == nullptr)
+                        document = rapidjson::Document();
+                        document.Parse(data.c_str());
+                        if (document["state"] == "start")
                         {
+                            // parse remote snake
+                            remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
+                            remoteSnake->config = config;
+                            canDrawRemoteSnake = true;
                             // send
                             document = rapidjson::Document(rapidjson::kObjectType);
                             rapidjson::Value value = snake->toJson(document.GetAllocator());
                             document.AddMember("snake", value, document.GetAllocator());
+                            document.AddMember("score", score, document.GetAllocator());
+                            document.AddMember("dataType", rapidjson::StringRef("snake"), document.GetAllocator());
                             rapidjson::StringBuffer buffer;
                             rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                             document.Accept(writer);
                             server.send(*new std::string(buffer.GetString()));
+
+                            while (!isMapReady)
+                            {
+                            }
+                            // send map info
+                            for (int y = 0; y < config.gridHeight; y++)
+                            {
+                                for (int x = 0; x < config.gridWidth; x++)
+                                {
+                                    document = rapidjson::Document(rapidjson::kObjectType);
+                                    document.AddMember("dataType", rapidjson::StringRef("cells"),
+                                                       document.GetAllocator());
+                                    document.AddMember("x", x, document.GetAllocator());
+                                    document.AddMember("y", y, document.GetAllocator());
+                                    document.AddMember("cell", cells[y][x]->toJson(document.GetAllocator()),
+                                                       document.GetAllocator());
+                                    rapidjson::StringBuffer buffer;
+                                    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                                    document.Accept(writer);
+                                    server.send(*new std::string(buffer.GetString()));
+                                }
+                            }
                         }
-                        // parse remote snake
-                        document.Parse(data.c_str());
-                        remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
-                        remoteSnake->config = config;
-                        canDrawRemoteSnake = true;
+                        else
+                        {
+                            remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
+                            remoteScore = document["score"].GetInt();
+                        }
                     });
                     context.run();
                 }).detach();
@@ -165,6 +182,8 @@ void LANGame::draw()
                                                           });
                     rapidjson::Value value = snake->toJson(document.GetAllocator());
                     document.AddMember("snake", value, document.GetAllocator());
+                    document.AddMember("score", score, document.GetAllocator());
+                    document.AddMember("state", rapidjson::StringRef("start"), document.GetAllocator());
                     rapidjson::StringBuffer buffer;
                     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                     document.Accept(writer);
@@ -176,9 +195,24 @@ void LANGame::draw()
                     {
                         document = rapidjson::Document();
                         document.Parse(data.c_str());
-                        remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
-                        remoteSnake->config = config;
-                        canDrawRemoteSnake = true;
+                        if (document["dataType"] == "snake")
+                        {
+                            remoteSnake = std::make_unique<SnakeBase>(SnakeBase::fromJson(document["snake"]));
+                            remoteScore = document["score"].GetInt();
+                            remoteSnake->config = config;
+                            canDrawRemoteSnake = true;
+                        }
+                        else if (document["dataType"] == "cells")
+                        {
+                            const int x = document["x"].GetInt();
+                            const int y = document["y"].GetInt();
+                            const auto& cell = std::make_shared<Cell>(Cell::fromJson(document["cell"]));
+                            cells[y][x]->type = cell->type;
+                        }
+                        else
+                        {
+                            gameState = GameState::Playing;
+                        }
                     });
                     context.run();
                 }).detach();
@@ -187,7 +221,20 @@ void LANGame::draw()
     }
     else if (gameState == GameState::Playing)
     {
-        remoteSnake->draw();
+        if (gameState == GameState::Playing)
+        {
+            remoteSnake->draw();
+            // draw score
+            char scoreText[30];
+            sprintf_s(scoreText, "RightPlayer Score: %d", remoteScore);
+            DrawText(scoreText, 10, 30, 20, BLACK);
+        }
+        else if (gameState == GameState::Paused)
+        {
+            char scoreText[30];
+            sprintf_s(scoreText, "RightPlayer Score: %d", remoteScore);
+            DrawText(scoreText, 10, 30, 20, BLACK);
+        }
     }
     GameBase::draw();
 }

@@ -45,7 +45,8 @@ GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
                    restartButton.bounds.y + restartButton.bounds.height, 200, 50
                }, "Menu"),
     cells(std::vector<std::vector<std::shared_ptr<Cell>>>(config.gridWidth,
-                                                          std::vector<std::shared_ptr<Cell>>(config.gridHeight)))
+                                                          std::vector<std::shared_ptr<Cell>>(
+                                                              config.gridHeight)))
 
 {
     randomCell();
@@ -190,7 +191,10 @@ void GameBase::restart()
 {
     while (true)
     {
-        if (gameState != GameState::Playing) continue;
+        if (gameState != GameState::Playing || !canUpdateCell)
+        {
+            continue;
+        }
         std::this_thread::sleep_for(std::chrono::seconds(5));
         for (int y = 0; y < config.gridHeight; y++)
         {
@@ -222,6 +226,7 @@ void GameBase::randomCell()
 {
     updateThread = std::thread(&GameBase::updateCell, this);
     cells.clear();
+
     // 计算权重总和
     const std::vector<WeightedCell> weightedCells = {
         {CellType::Blank, 400},
@@ -236,9 +241,18 @@ void GameBase::randomCell()
         cells.emplace_back();
         for (int x = 0; x < config.gridWidth; x++)
         {
-            cells[y].push_back(std::make_shared<Cell>(Cell::randomType(weightedCells),
-                                                      Vector2{static_cast<float>(x), static_cast<float>(y)},
-                                                      config));
+            if (x == 0 || x == config.gridWidth - 1)
+            {
+                cells[y].push_back(std::make_shared<Cell>(CellType::Blank,
+                                                          Vector2{static_cast<float>(x), static_cast<float>(y)},
+                                                          config));
+            }
+            else
+            {
+                cells[y].push_back(std::make_shared<Cell>(Cell::randomType(weightedCells),
+                                                          Vector2{static_cast<float>(x), static_cast<float>(y)},
+                                                          config));
+            }
         }
     }
     isMapReady = true;

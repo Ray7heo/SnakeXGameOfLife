@@ -38,6 +38,7 @@ public:
 
 protected:
     bool isMapReady = false;
+    bool canUpdateCell = true;
     std::unique_ptr<SnakeBase> snake;
     Button startButton;
     Button pauseButton;

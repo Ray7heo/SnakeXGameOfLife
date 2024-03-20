@@ -17,7 +17,6 @@ enum class CellType
     Wall
 };
 
-
 class WeightedCell
 {
 public:
@@ -47,10 +46,6 @@ public:
 
     rapidjson::Value toJson(rapidjson::Document::AllocatorType& allocator) const;
     static Cell fromJson(const rapidjson::Value& jsonValue);
-
-    static rapidjson::Value toJsons(const std::vector<std::vector<std::shared_ptr<Cell>>>& grid, rapidjson::Document::AllocatorType& allocator);
-
-    static std::vector<std::vector<std::shared_ptr<Cell>>> fromJsons(const rapidjson::Value& jsonValue);
 
 private:
     GameConfig config;

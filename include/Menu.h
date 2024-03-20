@@ -9,6 +9,11 @@
 #include "../include/GameBase.h"
 #include "../include/PlayerSnake.h"
 
+#include <raylib.h>
+#define DrawText RayDrawText
+#define RayDrawText DrawText
+#define RayCloseWindow CloseWindow
+#define CloseWindow RayCloseWindow
 
 
 class Menu
