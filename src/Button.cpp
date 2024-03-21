@@ -12,9 +12,9 @@ Button::Button(const Rectangle& bounds, const Color& color, const Color& textCol
 {
 }
 
-bool Button::isClicked(const Vector2 mousePos) const
+bool Button::isClicked() const
 {
-    return IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, bounds);
+    return IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), bounds);
 }
 
 

@@ -102,13 +102,13 @@ void Menu::selectGameMode()
         if (isClickedTailPurple) tailColor = PURPLE;
 
 
-        if (singleGameButton.isClicked(GetMousePosition()))
+        if (singleGameButton.isClicked())
         {
             const auto snake = new PlayerSnake(headColor,tailColor, config, Vector2{0, static_cast<float>(config.gridHeight) / 2});
             game = std::make_unique<SingleGame>(
                 config, *snake);
         }
-        if (pvpLocalGameButton.isClicked(GetMousePosition()))
+        if (pvpLocalGameButton.isClicked())
         {
             const auto leftSnake = new PlayerSnake(headColor,tailColor, config, Vector2{
                                                        0, static_cast<float>(config.gridHeight) / 2
@@ -119,14 +119,14 @@ void Menu::selectGameMode()
                                                     }, true);
             game = std::make_unique<PVPLocalGame>(config, *leftSnake, *rightSnake);
         }
-        if (pveGameButton.isClicked(GetMousePosition()))
+        if (pveGameButton.isClicked())
         {
             const auto snake = new PlayerSnake(headColor,tailColor, config, Vector2{
                                                    0, static_cast<float>(config.gridHeight) / 2
                                                });
             game = std::make_unique<PVEGame>(config, *snake);
         }
-        if (lanGameButton.isClicked(GetMousePosition()))
+        if (lanGameButton.isClicked())
         {
             const auto snake = new PlayerSnake(headColor,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight) / 2});
             game = std::make_unique<LANGame>(config, *snake);

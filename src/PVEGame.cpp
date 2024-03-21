@@ -99,7 +99,7 @@ void PVEGame::restart()
         PlayerSnake>(snake->headColor, snake->tailColor, config, Vector2{0, static_cast<float>(config.gridHeight / 2)});
 }
 
-int PVEGame::countLiveNeighbors(int x, int y) const
+int PVEGame::countLiveNeighbors(const int x, const int y) const
 {
     int count = 0;
     for (int i = x - 1; i <= x + 1; ++i)

@@ -191,7 +191,7 @@ void LANGame::draw()
             startButton.text = "Start";
         }
 
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && startButton.isClicked(GetMousePosition()))
+        if (startButton.isClicked())
         {
             std::thread([this]()
             {
@@ -216,7 +216,7 @@ void LANGame::draw()
             }).detach();
             syncState();
         }
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && hostButton.isClicked(GetMousePosition()))
+        if (hostButton.isClicked())
         {
             if (!isContextRun)
             {
@@ -307,7 +307,7 @@ void LANGame::draw()
                 }).detach();
             }
         }
-        else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && guestButton.isClicked(GetMousePosition()))
+        else if (guestButton.isClicked())
         {
             if (!isContextRun)
             {
@@ -388,7 +388,7 @@ void LANGame::draw()
         char scoreText[30];
         sprintf_s(scoreText, "RightPlayer Score: %d", remoteScore);
         DrawText(scoreText, 10, 30, 20, BLACK);
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pauseButton.isClicked(GetMousePosition()))
+        if (pauseButton.isClicked())
         {
             snake->direction = {0, 0};
         }
@@ -402,7 +402,7 @@ void LANGame::draw()
         {
             remoteSnake->draw();
         }
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
+        if (menuButton.isClicked())
         {
             rapidjson::Document document(rapidjson::kObjectType);
             document.AddMember("dataType", rapidjson::StringRef("state"), document.GetAllocator());
@@ -439,7 +439,7 @@ void LANGame::draw()
         {
             restartButton.bounds.width = 200;
             restartButton.text = "Restart";
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
+            if (menuButton.isClicked())
             {
                 rapidjson::Document document(rapidjson::kObjectType);
                 document.AddMember("dataType", rapidjson::StringRef("state"), document.GetAllocator());

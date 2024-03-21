@@ -1,5 +1,7 @@
 ﻿#include "../include/SingleGame.h"
 
+#include "../include/TextInput.h"
+
 SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake)
 {
 }
@@ -20,6 +22,17 @@ void SingleGame::update()
 
 void SingleGame::draw()
 {
+    if (gameState == GameState::GameOver)
+    {
+        auto textInput = TextInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, "");
+        textInput.draw();
+        textInput.update();
+        const auto button = Button({static_cast<float>(config.screenWidth) / 2 - 100, 30, 200, 50}, "Save Name");
+        if (button.isClicked())
+        {
+           std::cout << textInput.text << "\n"; 
+        }
+    }
     GameBase::draw();
 }
 
