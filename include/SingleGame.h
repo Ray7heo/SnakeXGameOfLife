@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "GameBase.h"
+#include "TextInput.h"
+#include "TextInput.h"
 
 class SingleGame final : public GameBase
 {
@@ -12,4 +14,6 @@ public:
 
 protected:
     void restart() override;
+private:
+    TextInput textInput;
 };

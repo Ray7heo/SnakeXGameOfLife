@@ -1,12 +1,11 @@
 ﻿#include "../include/SingleGame.h"
 
-#include "../include/TextInput.h"
 
-SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake)
+SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake), textInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, "")
 {
 }
 
-SingleGame::SingleGame()
+SingleGame::SingleGame(): textInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, "")
 {
     snake = std::make_unique<PlayerSnake>(RED,BLUE, config, Vector2{1, static_cast<float>(config.gridHeight / 2)});
 }
@@ -24,13 +23,12 @@ void SingleGame::draw()
 {
     if (gameState == GameState::GameOver)
     {
-        auto textInput = TextInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, "");
         textInput.draw();
         textInput.update();
         const auto button = Button({static_cast<float>(config.screenWidth) / 2 - 100, 30, 200, 50}, "Save Name");
+        button.draw();
         if (button.isClicked())
         {
-           std::cout << textInput.text << "\n"; 
         }
     }
     GameBase::draw();

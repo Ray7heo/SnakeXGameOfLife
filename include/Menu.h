@@ -31,6 +31,8 @@ private:
     Button pvpLocalGameButton;
     Button pveGameButton;
     Button singleGameButton;
+    TextInput textInput;
+    Button saveConfigButton;
 
     void drawGame() const;
     void selectGameMode();

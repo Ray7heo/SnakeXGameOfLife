@@ -171,8 +171,8 @@ void GameBase::draw()
             DrawText(scoreText, 10, 10, 20, BLACK);
 
             DrawText("Pause !",
-                     config.gridWidth * config.tileSize / 2 - MeasureText("Pause !", 30) / 2,
-                     config.gridHeight * config.tileSize / 2 - 20, 30, RED);
+                     config.screenWidth / 2 - MeasureText("Pause !", 30) / 2,
+                     config.screenHeight / 2 - 20, 30, BLACK);
             pauseButton.text = "resume";
             pauseButton.draw();
             menuButton.draw();
@@ -196,8 +196,8 @@ void GameBase::draw()
             restartButton.draw();
             menuButton.draw();
             DrawText("GameOver !",
-                     config.gridWidth / 2 * config.tileSize - MeasureText("GameOver !", 30) / 2,
-                     config.gridHeight / 2 * config.tileSize - restartButton.bounds.height, 30, RED);
+                     config.screenWidth / 2 - MeasureText("GameOver !", 30) / 2,
+                     config.screenHeight / 2 - restartButton.bounds.height, 30, RED);
             if (restartButton.isClicked())
             {
                 restart();
