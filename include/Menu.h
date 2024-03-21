@@ -23,6 +23,8 @@ public:
     void update();
 
 private:
+    Color headColor;
+    Color tailColor;
     GameConfig config;
     std::unique_ptr<GameBase> game;
     Button lanGameButton;

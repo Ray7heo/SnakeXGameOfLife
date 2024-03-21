@@ -12,15 +12,15 @@ LANGame::LANGame(): textInput(), server(context, ""), client(context, "", ""),
 
 LANGame::~LANGame()
 {
-	context.stop();
-	isContextRun = false;
+    context.stop();
+    isContextRun = false;
 }
 
 LANGame::LANGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake),
                                                               textInput({0, 0, 200, 30}, ""), server(context, "0000"),
                                                               client(context, "127.0.0.1", "12345"),
                                                               guestButton(
-	                                                              {0, textInput.bounds.height, 200, 50}, "Guest"),
+                                                                  {0, textInput.bounds.height, 200, 50}, "Guest"),
                                                               hostButton({0, guestButton.bounds.y + 50, 200, 50},
                                                                          "Host")
 {
@@ -28,29 +28,29 @@ LANGame::LANGame(const GameConfig& config, SnakeBase& snake): GameBase(config, s
 
 void LANGame::update()
 {
-	if (gameState == GameState::Playing || gameState == GameState::Paused || gameState == GameState::GameOver)
-	{
-		if (!snake->isDead)
-		{
-			snake->move();
-		}
-		if (!remoteSnake->isDead)
-		{
-			// Check collision with food
-			if (remoteSnake->body.empty()) return;
-			auto x = remoteSnake->body.front().x;
-			auto y = remoteSnake->body.front().y;
-			if (x >= 0 && x < config.gridWidth && y >= 0 && y < config.gridHeight)
-			{
-				const auto cell = cells[static_cast<int>(y)][static_cast<int>(x)];
-				if (cell->type == CellType::Edible || cell->type == CellType::Rot)
-				{
-					cell->type = CellType::Blank;
-				}
-			}
-		}
-	}
-	GameBase::update();
+    if (gameState == GameState::Playing || gameState == GameState::Paused || gameState == GameState::GameOver)
+    {
+        if (!snake->isDead)
+        {
+            snake->move();
+        }
+        if (!remoteSnake->isDead)
+        {
+            // Check collision with food
+            if (remoteSnake->body.empty()) return;
+            auto x = remoteSnake->body.front().x;
+            auto y = remoteSnake->body.front().y;
+            if (x >= 0 && x < config.gridWidth && y >= 0 && y < config.gridHeight)
+            {
+                const auto cell = cells[static_cast<int>(y)][static_cast<int>(x)];
+                if (cell->type == CellType::Edible || cell->type == CellType::Rot)
+                {
+                    cell->type = CellType::Blank;
+                }
+            }
+        }
+    }
+    GameBase::update();
 }
 
 void LANGame::restart()
@@ -439,6 +439,32 @@ void LANGame::draw()
         {
             restartButton.bounds.width = 200;
             restartButton.text = "Restart";
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && menuButton.isClicked(GetMousePosition()))
+            {
+                rapidjson::Document document(rapidjson::kObjectType);
+                document.AddMember("dataType", rapidjson::StringRef("state"), document.GetAllocator());
+                document.AddMember("state", rapidjson::StringRef("menu"), document.GetAllocator());
+                rapidjson::StringBuffer buffer;
+                rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                document.Accept(writer);
+                auto data = new std::string(buffer.GetString());
+                if (isHost)
+                {
+                    server.send(*data, [data](const std::error_code ec, size_t t)
+                    {
+                        delete data;
+                    });
+                }
+                else
+                {
+                    client.send(*data, [data](const std::error_code ec, size_t t)
+                    {
+                        delete data;
+                    });
+                }
+                context.stop();
+                isContextRun = false;
+            }
         }
         else
         {

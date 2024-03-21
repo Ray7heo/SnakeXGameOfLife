@@ -10,6 +10,7 @@
 #include "SnakeBase.h"
 #include "../include/PlayerSnake.h"
 #include "../include/AutoSnake.h"
+#include "ClickableRectangle.h"
 
 
 enum class GameState
