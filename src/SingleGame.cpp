@@ -28,9 +28,14 @@ void SingleGame::update()
 
 void SingleGame::draw()
 {
-    if (gameState == GameState::Start)
+    if (gameState == GameState::GameOver)
     {
-        DrawText("Top Score:", 0, 0, 30, BLACK);
+        textInput.draw();
+        textInput.update();
+        const auto button = Button({static_cast<float>(config.screenWidth) / 2 - 100, 30, 200, 50}, "Save Name");
+        button.draw();
+
+        DrawText("Top Score:", 0, 20, 30, BLACK);
         int end = 0;
         for (const auto& pairs : scores)
         {
@@ -39,18 +44,14 @@ void SingleGame::draw()
             for (const auto& value : pairs)
             {
                 auto text = value.first + ":" + std::to_string(value.second);
-                DrawText(text.c_str(), 0, 30 * end, 30,RED);
+                DrawText(text.c_str(), 0, 30 * end + 30, 30,RED);
             }
         }
-    }
-    else if (gameState == GameState::GameOver)
-    {
-        textInput.draw();
-        textInput.update();
-        const auto button = Button({static_cast<float>(config.screenWidth) / 2 - 100, 30, 200, 50}, "Save Name");
-        button.draw();
         if (button.isClicked())
         {
+            scores.insert(std::map<std::string, int>{
+                {textInput.text, score}
+            });
             std::ofstream file("data.txt", std::ios::app);
             const std::string data = textInput.text + ":" + std::to_string(score) + "\n";
             if (file.is_open())
@@ -72,7 +73,14 @@ void SingleGame::restart()
 
 bool SingleGame::CompareMaps::operator()(const std::map<std::string, int>& a, const std::map<std::string, int>& b) const
 {
-    return std::greater<std::string>()(b.begin()->first, a.begin()->first);
+    for (const auto& pair : a)
+    {
+        if (b.find(pair.first) == b.end() || b.at(pair.first) != pair.second)
+        {
+            return a > b;
+        }
+    }
+    return false;
 }
 
 void SingleGame::loadFile()

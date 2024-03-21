@@ -8,7 +8,7 @@ GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
                                        static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
                                    }, "Start"),
                        pauseButton({
-                                       static_cast<float>(config.screenWidth) - 120, 10, 100, 30
+                                       static_cast<float>(config.screenWidth) - 120, 0, 100, 30
                                    }, "Pause"),
                        restartButton({
                                          static_cast<float>(config.screenWidth) / 2 - 100,
@@ -34,7 +34,7 @@ GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
                     static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
                 }, "Start"),
     pauseButton({
-                    static_cast<float>(config.screenWidth) - 120, 10, 100, 30
+                    static_cast<float>(config.screenWidth) - 120, 0, 100, 30
                 }, "Pause"),
     restartButton({
                       static_cast<float>(config.screenWidth) / 2 - 100,
@@ -191,7 +191,7 @@ void GameBase::draw()
             // draw score
             char scoreText[20];
             sprintf_s(scoreText, "You Score: %d", score);
-            DrawText(scoreText, 10, 10, 20, BLACK);
+            DrawText(scoreText, 0, 0, 20, BLACK);
 
             restartButton.draw();
             menuButton.draw();
