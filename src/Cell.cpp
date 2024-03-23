@@ -22,7 +22,7 @@ Cell::Cell(const CellType type, const Vector2& position, const GameConfig& confi
 
 void Cell::draw() const
 {
-    Color color = WHITE;
+    Color color;
     switch (type)
     {
     case CellType::Blank:
@@ -34,8 +34,7 @@ void Cell::draw() const
         color = DARKGREEN;
         break;
     case CellType::Die:
-        color = RED;
-        break;
+        return;
     case CellType::Wall:
         color = BLACK;
         break;

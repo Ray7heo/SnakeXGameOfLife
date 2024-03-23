@@ -131,7 +131,8 @@ void LANGame::syncState()
     {
         while (true)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            if (gameState == GameState::Menu) return;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             rapidjson::Document document(rapidjson::kObjectType);
             rapidjson::Value value = snake->toJson(document.GetAllocator());
             document.AddMember("dataType", rapidjson::StringRef("snake"), document.GetAllocator());
@@ -163,8 +164,9 @@ void LANGame::syncState()
 
 void LANGame::draw()
 {
-    if (gameState == GameState::Start)
+    switch (gameState)
     {
+    case GameState::Start:
         if (canDrawRemoteSnake)
         {
             remoteSnake->draw();
@@ -244,7 +246,8 @@ void LANGame::draw()
                                 rapidjson::Value value = snake->toJson(document.GetAllocator());
                                 document.AddMember("snake", value, document.GetAllocator());
                                 document.AddMember("score", score, document.GetAllocator());
-                                document.AddMember("dataType", rapidjson::StringRef("snake"), document.GetAllocator());
+                                document.AddMember("dataType", rapidjson::StringRef("snake"),
+                                                   document.GetAllocator());
                                 rapidjson::StringBuffer buffer;
                                 rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
                                 document.Accept(writer);
@@ -311,6 +314,7 @@ void LANGame::draw()
         {
             if (!isContextRun)
             {
+                if (textInput.text.empty()) return;
                 isHost = false;
                 canDrawLocalSnake = true;
                 isContextRun = true;
@@ -380,57 +384,27 @@ void LANGame::draw()
                 }).detach();
             }
         }
-    }
-    else if (gameState == GameState::Playing)
-    {
+        break;
+    case GameState::Playing:
         remoteSnake->draw();
-        // draw score
+    // draw score
         char scoreText[30];
-        sprintf_s(scoreText, "RightPlayer Score: %d", remoteScore);
+        sprintf_s(scoreText, "RemotePlayer Score: %d", remoteScore);
         DrawText(scoreText, 10, 30, 20, BLACK);
         if (pauseButton.isClicked())
         {
             snake->direction = {0, 0};
         }
-    }
-    else if (gameState == GameState::Paused)
-    {
-        char scoreText[30];
-        sprintf_s(scoreText, "RightPlayer Score: %d", remoteScore);
+        break;
+    case GameState::Paused:
+        sprintf_s(scoreText, "RemotePlayer Score: %d", remoteScore);
         DrawText(scoreText, 10, 30, 20, BLACK);
         if (!remoteSnake->isDead)
         {
             remoteSnake->draw();
         }
-        if (menuButton.isClicked())
-        {
-            rapidjson::Document document(rapidjson::kObjectType);
-            document.AddMember("dataType", rapidjson::StringRef("state"), document.GetAllocator());
-            document.AddMember("state", rapidjson::StringRef("menu"), document.GetAllocator());
-            rapidjson::StringBuffer buffer;
-            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-            document.Accept(writer);
-            auto data = new std::string(buffer.GetString());
-            if (isHost)
-            {
-                server.send(*data, [data](const std::error_code ec, size_t t)
-                {
-                    delete data;
-                });
-            }
-            else
-            {
-                client.send(*data, [data](const std::error_code ec, size_t t)
-                {
-                    delete data;
-                });
-            }
-            context.stop();
-            isContextRun = false;
-        }
-    }
-    else if (gameState == GameState::GameOver)
-    {
+        break;
+    case GameState::GameOver:
         if (!remoteSnake->isDead)
         {
             remoteSnake->draw();
@@ -439,38 +413,17 @@ void LANGame::draw()
         {
             restartButton.bounds.width = 200;
             restartButton.text = "Restart";
-            if (menuButton.isClicked())
-            {
-                rapidjson::Document document(rapidjson::kObjectType);
-                document.AddMember("dataType", rapidjson::StringRef("state"), document.GetAllocator());
-                document.AddMember("state", rapidjson::StringRef("menu"), document.GetAllocator());
-                rapidjson::StringBuffer buffer;
-                rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                document.Accept(writer);
-                auto data = new std::string(buffer.GetString());
-                if (isHost)
-                {
-                    server.send(*data, [data](const std::error_code ec, size_t t)
-                    {
-                        delete data;
-                    });
-                }
-                else
-                {
-                    client.send(*data, [data](const std::error_code ec, size_t t)
-                    {
-                        delete data;
-                    });
-                }
-                context.stop();
-                isContextRun = false;
-            }
         }
         else
         {
             restartButton.bounds.width = 0;
             restartButton.text = "";
         }
+        break;
+    case GameState::Menu:
+        context.stop();
+        isContextRun = false;
+        break;
     }
     GameBase::draw();
 }
