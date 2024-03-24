@@ -35,9 +35,11 @@ public:
     GameBase(const GameConfig& config, SnakeBase& snake);
 
     virtual void update();
+    void dragCamera();
     virtual void draw();
 
 protected:
+    Camera2D camera;
     bool isMapReady = false;
     std::unique_ptr<SnakeBase> snake;
     Button startButton;

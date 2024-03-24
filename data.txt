@@ -4,3 +4,8 @@ THEO:0
 THE:0
 THEO:0
 THEO:28
+T:53
+T:0
+T:0
+T:0
+T:3

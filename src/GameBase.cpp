@@ -27,8 +27,7 @@ GameBase::GameBase() : config(GameConfig()), gameState(GameState::Start),
 }
 
 GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
-    config(config), gameState(GameState::Start), score(0),
-    snake(&snake),
+    config(config), gameState(GameState::Start), score(0), snake(&snake),
     startButton({
                     static_cast<float>(config.screenWidth) / 2 - 100,
                     static_cast<float>(config.screenHeight) / 2 - 25, 200, 50
@@ -46,9 +45,12 @@ GameBase::GameBase(const GameConfig& config, SnakeBase& snake):
                }, "Menu"),
     cells(std::vector<std::vector<std::shared_ptr<Cell>>>(config.gridWidth,
                                                           std::vector<std::shared_ptr<Cell>>(
-                                                              config.gridHeight)))
+                                                              config.gridHeight))),
+    camera({{0, 0}, {0, 0}, 0, 1.0f})
 
 {
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
     randomCell();
 }
 
@@ -85,6 +87,44 @@ void GameBase::update()
     }
 }
 
+bool isDragging = false;
+Vector2 dragStartPosition = {0};
+
+void GameBase::dragCamera()
+{
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+    {
+        if (!isDragging)
+        {
+            // 记录鼠标按下时的位置
+            dragStartPosition = GetMousePosition();
+            isDragging = true;
+        }
+        else
+        {
+            // 获取鼠标当前位置
+            Vector2 dragEndPosition = GetMousePosition();
+
+            // 计算拖动的偏移量
+            Vector2 dragOffset;
+            dragOffset.x = dragEndPosition.x - dragStartPosition.x;
+            dragOffset.y = dragEndPosition.y - dragStartPosition.y;
+
+            // 更新摄像机位置
+            camera.target.x -= dragOffset.x / 2;
+            camera.target.y -= dragOffset.y / 2;
+
+            // 更新拖动起始位置
+            dragStartPosition = dragEndPosition;
+        }
+    }
+    else
+    {
+        // 鼠标释放时停止拖动
+        isDragging = false;
+    }
+}
+
 void GameBase::draw()
 {
     switch (gameState)
@@ -105,28 +145,7 @@ void GameBase::draw()
         }
     case GameState::Playing:
         {
-            // draw grid
-            for (int i = 0; i <= config.gridHeight; ++i)
-            {
-                DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
-            }
-            for (int i = 0; i <= config.gridWidth; ++i)
-            {
-                DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
-            }
-            // draw cell
-            for (const auto& yCell : cells)
-            {
-                for (const auto& xCell : yCell)
-                {
-                    xCell->draw();
-                }
-            }
-            // draw snake
-            if (!snake->isDead)
-            {
-                snake->draw();
-            }
+            dragCamera();
             // draw score
             char scoreText[20];
             sprintf_s(scoreText, "You Score: %d", score);
@@ -139,32 +158,43 @@ void GameBase::draw()
                 snake->direction = {0, 0};
                 gameState = GameState::Paused;
             }
+
+            BeginMode2D(camera);
+            {
+                const float scroll = GetMouseWheelMove();
+                if (camera.zoom > 0)
+                {
+                    camera.zoom += scroll * 0.1f;
+                }
+                // draw grid
+                for (int i = 0; i <= config.gridHeight; ++i)
+                {
+                    DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
+                }
+                for (int i = 0; i <= config.gridWidth; ++i)
+                {
+                    DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
+                }
+                // draw cell
+                for (const auto& yCell : cells)
+                {
+                    for (const auto& xCell : yCell)
+                    {
+                        xCell->draw();
+                    }
+                }
+                // draw snake
+                if (!snake->isDead)
+                {
+                    snake->draw();
+                }
+            }
+            EndMode2D();
             break;
         }
     case GameState::Paused:
         {
-            // draw grid
-            for (int i = 0; i <= config.gridHeight; ++i)
-            {
-                DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
-            }
-            for (int i = 0; i <= config.gridWidth; ++i)
-            {
-                DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
-            }
-            // draw cell
-            for (const auto& yCell : cells)
-            {
-                for (const auto& xCell : yCell)
-                {
-                    xCell->draw();
-                }
-            }
-            // draw snake
-            if (!snake->isDead)
-            {
-                snake->draw();
-            }
+            dragCamera();
             // draw score
             char scoreText[20];
             sprintf_s(scoreText, "You Score: %d", score);
@@ -173,7 +203,7 @@ void GameBase::draw()
             DrawText("Pause !",
                      config.screenWidth / 2 - MeasureText("Pause !", 30) / 2,
                      config.screenHeight / 2 - 20, 30, BLACK);
-            pauseButton.text = "resume";
+            pauseButton.text ="resume";
             pauseButton.draw();
             menuButton.draw();
             if (pauseButton.isClicked())
@@ -184,6 +214,33 @@ void GameBase::draw()
             {
                 gameState = GameState::Menu;
             }
+            BeginMode2D(camera);
+            {
+                // draw grid
+                for (int i = 0; i <= config.gridHeight; ++i)
+                {
+                    DrawLine(0, i * config.tileSize, config.gridWidth * config.tileSize, i * config.tileSize, BLACK);
+                }
+                for (int i = 0; i <= config.gridWidth; ++i)
+                {
+                    DrawLine(i * config.tileSize, 0, i * config.tileSize, config.gridHeight * config.tileSize, BLACK);
+                }
+                // draw cell
+                for (const auto& yCell : cells)
+                {
+                    for (const auto& xCell : yCell)
+                    {
+                        xCell->draw();
+                    }
+                }
+                // draw snake
+                if (!snake->isDead)
+                {
+                    snake->draw();
+                }
+            }
+            EndMode2D();
+
             break;
         }
     case GameState::GameOver:
@@ -227,7 +284,7 @@ void GameBase::restart()
         {
             continue;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         for (int y = 0; y < config.gridHeight; y++)
         {
             for (int x = 0; x < config.gridWidth; x++)
