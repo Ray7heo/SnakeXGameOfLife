@@ -146,19 +146,6 @@ void GameBase::draw()
     case GameState::Playing:
         {
             dragCamera();
-            // draw score
-            char scoreText[20];
-            sprintf_s(scoreText, "You Score: %d", score);
-            DrawText(scoreText, 10, 10, 20, BLACK);
-            // draw button
-            pauseButton.text = "pause";
-            pauseButton.draw();
-            if (pauseButton.isClicked())
-            {
-                snake->direction = {0, 0};
-                gameState = GameState::Paused;
-            }
-
             BeginMode2D(camera);
             {
                 const float scroll = GetMouseWheelMove();
@@ -190,30 +177,24 @@ void GameBase::draw()
                 }
             }
             EndMode2D();
+            // draw score
+            char scoreText[20];
+            sprintf_s(scoreText, "You Score: %d", score);
+            DrawText(scoreText, 10, 10, 20, BLACK);
+            // draw button
+            pauseButton.text = "pause";
+            pauseButton.draw();
+            if (pauseButton.isClicked())
+            {
+                snake->direction = {0, 0};
+                gameState = GameState::Paused;
+            }
             break;
         }
     case GameState::Paused:
         {
             dragCamera();
-            // draw score
-            char scoreText[20];
-            sprintf_s(scoreText, "You Score: %d", score);
-            DrawText(scoreText, 10, 10, 20, BLACK);
 
-            DrawText("Pause !",
-                     config.screenWidth / 2 - MeasureText("Pause !", 30) / 2,
-                     config.screenHeight / 2 - 20, 30, BLACK);
-            pauseButton.text ="resume";
-            pauseButton.draw();
-            menuButton.draw();
-            if (pauseButton.isClicked())
-            {
-                gameState = GameState::Playing;
-            }
-            if (menuButton.isClicked())
-            {
-                gameState = GameState::Menu;
-            }
             BeginMode2D(camera);
             {
                 // draw grid
@@ -240,7 +221,25 @@ void GameBase::draw()
                 }
             }
             EndMode2D();
+            // draw score
+            char scoreText[20];
+            sprintf_s(scoreText, "You Score: %d", score);
+            DrawText(scoreText, 10, 10, 20, BLACK);
 
+            DrawText("Pause !",
+                     config.screenWidth / 2 - MeasureText("Pause !", 30) / 2,
+                     config.screenHeight / 2 - 20, 30, BLACK);
+            pauseButton.text = "resume";
+            pauseButton.draw();
+            menuButton.draw();
+            if (pauseButton.isClicked())
+            {
+                gameState = GameState::Playing;
+            }
+            if (menuButton.isClicked())
+            {
+                gameState = GameState::Menu;
+            }
             break;
         }
     case GameState::GameOver:
@@ -280,30 +279,29 @@ void GameBase::restart()
 {
     while (true)
     {
-        if (gameState != GameState::Playing)
+        if (gameState == GameState::Playing || gameState == GameState::Paused)
         {
-            continue;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        for (int y = 0; y < config.gridHeight; y++)
-        {
-            for (int x = 0; x < config.gridWidth; x++)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            for (int y = 0; y < config.gridHeight; y++)
             {
-                const auto cell = cells[y][x];
-                const auto count = countLiveNeighbors(x, y);
-                if (cell->type == CellType::Edible || cell->type == CellType::Rot)
+                for (int x = 0; x < config.gridWidth; x++)
                 {
-                    if (count < 2 || count > 3)
+                    const auto cell = cells[y][x];
+                    const auto count = countLiveNeighbors(x, y);
+                    if (cell->type == CellType::Edible || cell->type == CellType::Rot)
                     {
-                        cell->type = CellType::Die;
-                        cell->reductionCounter();
+                        if (count < 2 || count > 3)
+                        {
+                            cell->type = CellType::Die;
+                            cell->reductionCounter();
+                        }
                     }
-                }
-                else if (cell->type == CellType::Die)
-                {
-                    if (count == 3)
+                    else if (cell->type == CellType::Die)
                     {
-                        cell->resurgence();
+                        if (count == 3)
+                        {
+                            cell->resurgence();
+                        }
                     }
                 }
             }
@@ -317,11 +315,11 @@ void GameBase::randomCell()
 
     // 计算权重总和
     const std::vector<WeightedCell> weightedCells = {
-        {CellType::Blank, 400},
-        {CellType::Edible, 50},
-        {CellType::Rot, 20},
-        {CellType::Die, 15},
-        {CellType::Wall, 5},
+        {CellType::Blank, 100},
+        {CellType::Edible, 100},
+        {CellType::Rot, 100},
+        {CellType::Die, 500},
+        {CellType::Wall, 20},
     };
 
     for (int y = 0; y < config.gridHeight; y++)

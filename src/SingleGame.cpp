@@ -1,17 +1,18 @@
 ﻿#include "../include/SingleGame.h"
 
 
-SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake): GameBase(config, snake),
-                                                                    textInput({
-                                                                                  static_cast<float>(config.screenWidth)
-                                                                                  / 2 - 100,
-                                                                                  0, 200, 30
-                                                                              }, "")
+SingleGame::SingleGame(const GameConfig& config, SnakeBase& snake):
+    GameBase(config, snake), textInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, ""),
+    tileNumInput({0, static_cast<float>(config.screenHeight) - 80, 100, 30}, std::to_string(config.gridWidth)),
+    saveConfigButton({0, static_cast<float>(config.screenHeight) - 50, 200, 50}, "Save Cell Number")
 {
     loadFile();
 }
 
-SingleGame::SingleGame(): textInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, "")
+SingleGame::SingleGame(): textInput({static_cast<float>(config.screenWidth) / 2 - 100, 0, 200, 30}, ""),
+                          tileNumInput({0, static_cast<float>(config.screenHeight) - 80, 100, 30}, std::to_string(config.gridWidth)),
+                          saveConfigButton({0, static_cast<float>(config.screenHeight) - 50, 200, 50},
+                                           "Save Cell Number")
 {
     snake = std::make_unique<PlayerSnake>(RED,BLUE, config, Vector2{1, static_cast<float>(config.gridHeight / 2)});
     loadFile();
@@ -28,10 +29,17 @@ void SingleGame::update()
 
 void SingleGame::draw()
 {
-    if (gameState == GameState::GameOver)
+    if (gameState == GameState::Start)
+    {
+        saveConfigButton.draw();
+        tileNumInput.draw();
+        tileNumInput.update();
+    }
+    else if (gameState == GameState::GameOver)
     {
         textInput.draw();
         textInput.update();
+
         const auto button = Button({static_cast<float>(config.screenWidth) / 2 - 100, 30, 200, 50}, "Save Name");
         button.draw();
 
@@ -59,6 +67,16 @@ void SingleGame::draw()
                 file << data;
                 file.close();
             }
+        }
+        if (saveConfigButton.isClicked())
+        {
+            const auto cellNum = std::stoi(tileNumInput.text);
+            config.gridHeight = cellNum;
+            config.gridWidth = cellNum;
+            config.tileSize = config.screenHeight / cellNum;
+            snake = std::make_unique<
+                PlayerSnake>(snake->headColor, snake->tailColor, config,
+                             Vector2{0, static_cast<float>(config.gridHeight / 2)});
         }
     }
     GameBase::draw();

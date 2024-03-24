@@ -21,6 +21,9 @@ protected:
 private:
     TextInput textInput;
 
+    TextInput tileNumInput;
+    Button saveConfigButton;
+
     struct CompareMaps
     {
         bool operator()(const std::map<std::string, int>& a, const std::map<std::string, int>& b) const;

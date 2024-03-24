@@ -14,7 +14,7 @@ SnakeBase::SnakeBase(const Color& headColor, const Color& tailColor, const GameC
 void SnakeBase::move()
 {
     // Move body
-    if (body.empty()) return;
+    if (body.empty() || (direction.x == 0 && direction.y == 0)) return;
     const auto nexPos = Vector2{body.front().x + direction.x, body.front().y + direction.y};
     body.insert(body.begin(), nexPos);
     body.pop_back();

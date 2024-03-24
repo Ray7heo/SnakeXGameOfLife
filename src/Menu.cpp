@@ -19,8 +19,7 @@ Menu::Menu(const GameConfig& config): headColor(RED), tailColor(BLUE),
                                       singleGameButton({
                                                            static_cast<float>(config.screenWidth) / 2 - 100,
                                                            pveGameButton.bounds.y - 50, 200, 50
-                                                       }, "Single"), textInput({0, static_cast<float>(config.screenHeight) - 80, 100, 30}, ""),
-                                      saveConfigButton({0, static_cast<float>(config.screenHeight) - 50, 200, 50}, "Save Cell Number")
+                                                       }, "Single")
 {
     InitWindow(config.screenWidth, config.screenHeight, "Snake X Game of Life");
 }
@@ -63,9 +62,7 @@ void Menu::selectGameMode()
         pvpLocalGameButton.draw();
         pveGameButton.draw();
         lanGameButton.draw();
-        saveConfigButton.draw();
-        textInput.draw();
-        textInput.update();
+
         DrawText("Snake X Game of Life",
                  config.screenWidth / 2 - MeasureText("Snake X Game of Life", 50) / 2,
                  config.screenHeight / 2, 50, RED);
@@ -134,13 +131,6 @@ void Menu::selectGameMode()
         {
             const auto snake = new PlayerSnake(headColor,BLUE, config, Vector2{0, static_cast<float>(config.gridHeight) / 2});
             game = std::make_unique<LANGame>(config, *snake);
-        }
-        if (saveConfigButton.isClicked())
-        {
-            const auto cellNum = std::stoi(textInput.text);
-            config.gridHeight = cellNum;
-            config.gridWidth = cellNum;
-            config.tileSize = config.screenHeight / cellNum;
         }
     }
 }
