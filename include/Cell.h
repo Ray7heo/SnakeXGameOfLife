@@ -47,8 +47,8 @@ public:
     rapidjson::Value toJson(rapidjson::Document::AllocatorType& allocator) const;
     static Cell fromJson(const rapidjson::Value& jsonValue);
 
+    int counter = 10;
 private:
     GameConfig config;
-    int counter = 10;
 
 };

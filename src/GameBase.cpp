@@ -279,6 +279,7 @@ void GameBase::restart()
 {
     while (true)
     {
+        if (!canUpdateCell) return;
         if (gameState == GameState::Playing || gameState == GameState::Paused)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));

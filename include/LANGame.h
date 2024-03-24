@@ -31,8 +31,11 @@ protected:
     int countLiveNeighbors(int x, int y) const override;
 
 private:
+    std::mutex m;
     bool canSyncState = true;
     void syncState();
+    void runServer();
+    void runClient();
     asio::io_context context;
     UdpServer server;
     UdpClient client;

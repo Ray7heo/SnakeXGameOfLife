@@ -39,6 +39,7 @@ public:
     virtual void draw();
 
 protected:
+    bool canUpdateCell = true;
     Camera2D camera;
     bool isMapReady = false;
     std::unique_ptr<SnakeBase> snake;

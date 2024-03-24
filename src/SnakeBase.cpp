@@ -50,22 +50,22 @@ void SnakeBase::draw() const
     if (!isDead)
     {
         // draw head
-        DrawRectangle(body.front().x * config.tileSize, body.front().y * config.tileSize, config.tileSize,
-                      config.tileSize,
-                      headColor);
 
+        DrawCircle(body.front().x * config.tileSize + config.tileSize / 2,
+                   body.front().y * config.tileSize + config.tileSize / 2, config.tileSize / 2,
+                   headColor);
         // draw body
         for (size_t i = 1; i < body.size() - 1; i++)
         {
             DrawRectangle(body[i].x * config.tileSize, body[i].y * config.tileSize, config.tileSize, config.tileSize,
                           GREEN);
         }
-
         // draw tail
         if (body.size() > 1)
         {
-            DrawRectangle(body.back().x * config.tileSize, body.back().y * config.tileSize,
-                          config.tileSize, config.tileSize, tailColor);
+            DrawCircle(body.back().x * config.tileSize + config.tileSize / 2,
+                       body.back().y * config.tileSize + config.tileSize / 2, config.tileSize / 1.5,
+                       tailColor);
         }
     }
 }
@@ -145,7 +145,7 @@ SnakeBase SnakeBase::fromJson(const rapidjson::Value& json)
 
     // 反序列化 headColor
     const rapidjson::Value& headColorValue = json["headColor"];
-    
+
     snake.headColor = deserializeColor(headColorValue);
 
     // 反序列化 tailColor
